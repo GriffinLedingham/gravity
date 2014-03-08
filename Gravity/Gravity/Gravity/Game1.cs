@@ -33,11 +33,6 @@ namespace Gravity
 
         private World world;
 
-        private Body Planet;
-        private Vector2 PlanetSize = new Vector2(100 * pixelToUnit, 100 * pixelToUnit);
-
-        private Vector2 PlanetGrav = new Vector2(10 * pixelToUnit, 10 * pixelToUnit);
-
         private Body Projectile;
         private Vector2 ProjectileSize = new Vector2(20 * pixelToUnit, 20 * pixelToUnit);
 
@@ -50,6 +45,8 @@ namespace Gravity
         private bool projLock = false;
 
         private Vector2 originalPos = Vector2.Zero;
+
+        private DeathStar[] DeathStars = new DeathStar[2];
 
         public Game1()
         {
@@ -90,13 +87,12 @@ namespace Gravity
 
             world = new World(new Vector2(0, 0)); // Grav 0 cause we in space hommie
 
-            Planet = BodyFactory.CreateRectangle(world, 100 * pixelToUnit, 100 * pixelToUnit, 10f);
-            Planet.BodyType = BodyType.Static;
-            Planet.Position = new Vector2(400 * pixelToUnit, 220 * pixelToUnit);
+            DeathStars[0] = new DeathStar(new Vector2(100, 100), new Vector2(100, 100), new Vector2(0.8f), world);
+            DeathStars[1] = new DeathStar(new Vector2(100, 100), new Vector2(600, 100), new Vector2(1), world);
 
             Projectile = BodyFactory.CreateRectangle(world, 20 * pixelToUnit, 20 * pixelToUnit, 10f);
             Projectile.BodyType = BodyType.Dynamic;
-            Projectile.Position = originalPos = new Vector2(200 * pixelToUnit, 50 * pixelToUnit);
+            Projectile.Position = originalPos = new Vector2(400 * pixelToUnit, 50 * pixelToUnit);
             Projectile.ApplyForce(new Vector2(20, 20));
 
             windowWidth = Window.ClientBounds.Width;
@@ -175,7 +171,7 @@ namespace Gravity
                         objectDrag = false;
 
                         projForce = originalPos - tl.Position;
-                        float len = projForce.Length() * 4;
+                        float len = projForce.Length() * 8;
                         projForce.Normalize();
 
                         projForce = projForce * len * pixelToUnit;
@@ -190,14 +186,22 @@ namespace Gravity
             if (objectMoving)
             {
 
-                Vector2 forcedir = (Planet.Position + PlanetSize / 2) * unitToPixel - (Projectile.Position + ProjectileSize / 2) * unitToPixel;
-                float len = forcedir.Length();
-                forcedir.Normalize();
 
-                forcedir = forcedir * 0.5f;
+                foreach (DeathStar d in DeathStars)
+                {
+                    Vector2 forcedir = (d.Position) - (Projectile.Position ) * unitToPixel;
+                    float len = forcedir.Length();
+                    forcedir.Normalize();
 
-                projForce += forcedir;
 
+                    if (len < 300)
+                    {
+                        forcedir = forcedir * (1-len/300) * d.Pull;
+                        projForce += forcedir;
+
+                    }
+
+                }
 
                 Projectile.ApplyForce(projForce);
             }
@@ -228,9 +232,12 @@ namespace Gravity
 
             spriteBatch.Begin(SpriteSortMode.FrontToBack, BlendState.AlphaBlend, null, null, null, null, Matrix.CreateTranslation(transVector) * Matrix.CreateScale(new Vector3(1.0f, 1.0f, 1)));
 
-            //spriteBatch.Begin();
+            foreach (DeathStar d in DeathStars)
+            {
+                spriteBatch.Draw(Game1.Pixi, d.Position, null, Color.Red, d.Planet.Rotation, new Vector2(Game1.Pixi.Width / 2.0f, Game1.Pixi.Height / 2.0f), d.Size, SpriteEffects.None, 0);
 
-            spriteBatch.Draw(Game1.Pixi, Planet.Position * unitToPixel, null, Color.Red, Planet.Rotation, new Vector2(Game1.Pixi.Width / 2.0f, Game1.Pixi.Height / 2.0f), new Vector2(PlanetSize.X * unitToPixel, PlanetSize.Y * unitToPixel), SpriteEffects.None, 0);
+            }
+
             spriteBatch.Draw(Game1.Pixi, Projectile.Position * unitToPixel, null, Color.Yellow, Projectile.Rotation, new Vector2(Game1.Pixi.Width / 2.0f, Game1.Pixi.Height / 2.0f), new Vector2(ProjectileSize.X * unitToPixel, ProjectileSize.Y * unitToPixel), SpriteEffects.None, 0);
 
             spriteBatch.End();
