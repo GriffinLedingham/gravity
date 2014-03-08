@@ -31,16 +31,19 @@ namespace Gravity
         const float unitToPixel = 100.0f;
         const float pixelToUnit = 1 / unitToPixel;
 
-        private TileMap map;
-
         private World world;
 
-        private Body testBody;
-        private Vector2 testBodySize = new Vector2(100 * pixelToUnit, 90 * pixelToUnit);
+        private Body Planet;
+        private Vector2 PlanetSize = new Vector2(100 * pixelToUnit, 100 * pixelToUnit);
+
+        private Vector2 PlanetGrav = new Vector2(10 * pixelToUnit, 10 * pixelToUnit);
+
+        private Body Projectile;
+        private Vector2 ProjectileSize = new Vector2(20 * pixelToUnit, 20 * pixelToUnit);
 
         public Game1()
         {
-            
+
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
 
@@ -75,16 +78,16 @@ namespace Gravity
 
             Pixi = Content.Load<Texture2D>("pixi");
 
-            //world
-            world = new World(new Vector2(0, 0));
+            world = new World(new Vector2(0, 0)); // Grav 0 cause we in space hommie
 
-            testBody = BodyFactory.CreateRectangle(world, 100 * pixelToUnit, 90 * pixelToUnit, 10f);
-            testBody.BodyType = BodyType.Dynamic;
-            testBody.Position = new Vector2(100 * pixelToUnit, 100 * pixelToUnit);
+            Planet = BodyFactory.CreateRectangle(world, 100 * pixelToUnit, 100 * pixelToUnit, 10f);
+            Planet.BodyType = BodyType.Static;
+            Planet.Position = new Vector2(400 * pixelToUnit, 220 * pixelToUnit);
 
-
-            
-        
+            Projectile = BodyFactory.CreateRectangle(world, 20 * pixelToUnit, 20 * pixelToUnit, 10f);
+            Projectile.BodyType = BodyType.Dynamic;
+            Projectile.Position = new Vector2(200 * pixelToUnit, 50 * pixelToUnit);
+            Projectile.ApplyForce(new Vector2(20, 20));
         }
 
         /// <summary>
@@ -107,27 +110,21 @@ namespace Gravity
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
                 this.Exit();
 
-            Vector2 force1 = Vector2.Zero;
+            Vector2 projForce = new Vector2(-0.1f, 0.1f);
 
-            if(TouchPanel.IsGestureAvailable) {
-                GestureSample g = TouchPanel.ReadGesture();
+            Vector2 forcedir = (Planet.Position + PlanetSize / 2) * unitToPixel - (Projectile.Position + ProjectileSize / 2) * unitToPixel;
+            float len = forcedir.Length();
+            forcedir.Normalize();
 
-                if (g.GestureType == GestureType.Flick && g.Delta.Y > 0)
-                {
-                    force1 += new Vector2( -100f, 0);
+            forcedir = forcedir * 0.5f;
 
-                }
-                else if (g.GestureType == GestureType.Flick && g.Delta.Y < 0)
-                {
-                    force1 += new Vector2(100f, 0);
+            projForce += forcedir;
 
-                }
 
-            }
-
-            testBody.ApplyForce(force1);
+            Projectile.ApplyForce(projForce);
 
             world.Step((float)gameTime.ElapsedGameTime.TotalSeconds);
+
 
             base.Update(gameTime);
         }
@@ -142,7 +139,8 @@ namespace Gravity
 
             spriteBatch.Begin();
 
-            spriteBatch.Draw(Game1.Pixi, testBody.Position * unitToPixel, null, Color.Black, testBody.Rotation, new Vector2(Game1.Pixi.Width / 2.0f, Game1.Pixi.Height / 2.0f), new Vector2(testBodySize.X * unitToPixel, testBodySize.Y * unitToPixel), SpriteEffects.None, 0);
+            spriteBatch.Draw(Game1.Pixi, Planet.Position * unitToPixel, null, Color.Red, Planet.Rotation, new Vector2(Game1.Pixi.Width / 2.0f, Game1.Pixi.Height / 2.0f), new Vector2(PlanetSize.X * unitToPixel, PlanetSize.Y * unitToPixel), SpriteEffects.None, 0);
+            spriteBatch.Draw(Game1.Pixi, Projectile.Position * unitToPixel, null, Color.Yellow, Projectile.Rotation, new Vector2(Game1.Pixi.Width / 2.0f, Game1.Pixi.Height / 2.0f), new Vector2(ProjectileSize.X * unitToPixel, ProjectileSize.Y * unitToPixel), SpriteEffects.None, 0);
 
             spriteBatch.End();
 
