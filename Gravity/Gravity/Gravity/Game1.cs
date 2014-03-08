@@ -44,6 +44,11 @@ namespace Gravity
         private bool objectMoving = false;
         private bool objectDrag = false;
 
+        private int windowWidth, windowHeight;
+        private float camX, camY;
+
+        private bool projLock = false;
+
         private Vector2 originalPos = Vector2.Zero;
 
         public Game1()
@@ -93,6 +98,9 @@ namespace Gravity
             Projectile.BodyType = BodyType.Dynamic;
             Projectile.Position = originalPos = new Vector2(200 * pixelToUnit, 50 * pixelToUnit);
             Projectile.ApplyForce(new Vector2(20, 20));
+
+            windowWidth = Window.ClientBounds.Width;
+            windowHeight = Window.ClientBounds.Height;
         }
 
         /// <summary>
@@ -127,7 +135,7 @@ namespace Gravity
 
             Vector2 projForce = Vector2.Zero;
 
-            if (!objectMoving)
+            if (!objectMoving && projLock)
             {
                 TouchCollection touchCollection = TouchPanel.GetState();
                 foreach (TouchLocation tl in touchCollection)
@@ -159,6 +167,29 @@ namespace Gravity
                 }
             }
 
+            if (!projLock)
+            {
+                TouchCollection touchCollection = TouchPanel.GetState();
+                foreach (TouchLocation tl in touchCollection)
+                {
+                    if ((tl.State == TouchLocationState.Pressed) || (tl.State == TouchLocationState.Moved))
+                    {
+
+                        TouchLocation old;
+
+                        tl.TryGetPreviousLocation(out old);
+                        if (old.Position.X > 0)
+                        {
+                            camX = camX + (tl.Position.X - old.Position.X);
+                            camY = camY + (tl.Position.Y - old.Position.Y);
+                        }
+                        else
+                            originalPos = tl.Position;
+
+                    }
+                }
+            }
+
             if (objectMoving)
             {
 
@@ -176,6 +207,25 @@ namespace Gravity
 
             world.Step((float)gameTime.ElapsedGameTime.TotalSeconds);
 
+            if (projLock)
+            {
+                if (Projectile.Position.Y * unitToPixel < (windowHeight / 2))
+                {
+                    camY = 0;
+                }
+                else
+                {
+                    camY = (int)(-Projectile.Position.Y * unitToPixel + windowHeight / 2.0f);
+                }
+                if (Projectile.Position.X * unitToPixel < (windowWidth / 2))
+                {
+                    camX = 0;
+                }
+                else
+                {
+                    camX = (int)(-Projectile.Position.X * unitToPixel + windowWidth / 2.0f);
+                }
+            }
 
             base.Update(gameTime);
         }
@@ -188,7 +238,11 @@ namespace Gravity
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            spriteBatch.Begin();
+            Vector3 transVector = new Vector3(camX, camY, 0.0f);
+
+            spriteBatch.Begin(SpriteSortMode.FrontToBack, BlendState.AlphaBlend, null, null, null, null, Matrix.CreateTranslation(transVector) * Matrix.CreateScale(new Vector3(1.0f, 1.0f, 1)));
+
+            //spriteBatch.Begin();
 
             spriteBatch.Draw(Game1.Pixi, Planet.Position * unitToPixel, null, Color.Red, Planet.Rotation, new Vector2(Game1.Pixi.Width / 2.0f, Game1.Pixi.Height / 2.0f), new Vector2(PlanetSize.X * unitToPixel, PlanetSize.Y * unitToPixel), SpriteEffects.None, 0);
             spriteBatch.Draw(Game1.Pixi, Projectile.Position * unitToPixel, null, Color.Yellow, Projectile.Rotation, new Vector2(Game1.Pixi.Width / 2.0f, Game1.Pixi.Height / 2.0f), new Vector2(ProjectileSize.X * unitToPixel, ProjectileSize.Y * unitToPixel), SpriteEffects.None, 0);
