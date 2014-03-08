@@ -135,7 +135,7 @@ namespace Gravity
 
             Vector2 projForce = Vector2.Zero;
 
-            if (!objectMoving && projLock)
+            if (!objectMoving)
             {
                 TouchCollection touchCollection = TouchPanel.GetState();
                 foreach (TouchLocation tl in touchCollection)
@@ -146,13 +146,30 @@ namespace Gravity
                         TouchLocation old;
 
                         tl.TryGetPreviousLocation(out old);
-                        if (old.Position.X > 0)
-                            Projectile.Position = (Projectile.Position * unitToPixel + (tl.Position - old.Position)) * pixelToUnit;
+                        Debug.WriteLine(Vector2.Distance(tl.Position - new Vector2(camX, camY), Projectile.Position * unitToPixel));
+                        if (Vector2.Distance(tl.Position - new Vector2(camX, camY), Projectile.Position * unitToPixel) < 100)
+                        {
+
+                            if (old.Position.X > 0)
+                                Projectile.Position = (Projectile.Position * unitToPixel + (tl.Position - old.Position)) * pixelToUnit;
+                            else
+                                originalPos = tl.Position;
+                            objectDrag = true;
+                        }
                         else
-                            originalPos = tl.Position;
+                        {
+                            if (old.Position.X > 0)
+                            {
+                                camX = camX + (tl.Position.X - old.Position.X);
+                                camY = camY + (tl.Position.Y - old.Position.Y);
+                            }
+                            else
+                                originalPos = tl.Position;
+
+                        }
 
                     }
-                    else if (tl.State == TouchLocationState.Released)
+                    else if (tl.State == TouchLocationState.Released && objectDrag)
                     {
                         objectMoving = true;
                         objectDrag = false;
@@ -163,28 +180,8 @@ namespace Gravity
 
                         projForce = projForce * len * pixelToUnit;
 
-                    }
-                }
-            }
-
-            if (!projLock)
-            {
-                TouchCollection touchCollection = TouchPanel.GetState();
-                foreach (TouchLocation tl in touchCollection)
-                {
-                    if ((tl.State == TouchLocationState.Pressed) || (tl.State == TouchLocationState.Moved))
-                    {
-
-                        TouchLocation old;
-
-                        tl.TryGetPreviousLocation(out old);
-                        if (old.Position.X > 0)
-                        {
-                            camX = camX + (tl.Position.X - old.Position.X);
-                            camY = camY + (tl.Position.Y - old.Position.Y);
-                        }
-                        else
-                            originalPos = tl.Position;
+                        camX = Projectile.Position.X * unitToPixel;
+                        camY = Projectile.Position.Y * unitToPixel;
 
                     }
                 }
@@ -207,24 +204,13 @@ namespace Gravity
 
             world.Step((float)gameTime.ElapsedGameTime.TotalSeconds);
 
-            if (projLock)
+            if (objectMoving)
             {
-                if (Projectile.Position.Y * unitToPixel < (windowHeight / 2))
-                {
-                    camY = 0;
-                }
-                else
-                {
+                    
                     camY = (int)(-Projectile.Position.Y * unitToPixel + windowHeight / 2.0f);
-                }
-                if (Projectile.Position.X * unitToPixel < (windowWidth / 2))
-                {
-                    camX = 0;
-                }
-                else
-                {
+
                     camX = (int)(-Projectile.Position.X * unitToPixel + windowWidth / 2.0f);
-                }
+                
             }
 
             base.Update(gameTime);
