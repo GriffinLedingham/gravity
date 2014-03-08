@@ -87,8 +87,8 @@ namespace Gravity
 
             world = new World(new Vector2(0, 0)); // Grav 0 cause we in space hommie
 
-            DeathStars[0] = new DeathStar(new Vector2(100, 100), new Vector2(100, 100), new Vector2(0.8f), world);
-            DeathStars[1] = new DeathStar(new Vector2(100, 100), new Vector2(600, 100), new Vector2(1), world);
+            DeathStars[0] = new DeathStar(new Vector2(100, 100), new Vector2(100, 100), new Vector2(3), world);
+            DeathStars[1] = new DeathStar(new Vector2(100, 100), new Vector2(1300, 100), new Vector2(3), world);
 
             Projectile = BodyFactory.CreateRectangle(world, 20 * pixelToUnit, 20 * pixelToUnit, 10f);
             Projectile.BodyType = BodyType.Dynamic;
@@ -121,7 +121,7 @@ namespace Gravity
                 objectMoving = false;
                 objectDrag = false;
 
-                Projectile.Position = new Vector2(200 * pixelToUnit, 50 * pixelToUnit);
+                Projectile.Position = new Vector2(400 * pixelToUnit, 50 * pixelToUnit);
                 Projectile.AngularVelocity = 0;
                 Projectile.LinearVelocity = Vector2.Zero;
                 Projectile.ApplyForce(Vector2.Zero);
@@ -178,7 +178,7 @@ namespace Gravity
                         objectDrag = false;
 
                         projForce = originalPos - tl.Position;
-                        float len = projForce.Length() * 8;
+                        float len = projForce.Length() * 15;
                         projForce.Normalize();
 
                         projForce = projForce * len * pixelToUnit;
@@ -227,9 +227,9 @@ namespace Gravity
                     forcedir.Normalize();
 
 
-                    if (len < 300)
+                    if (len < 1000)
                     {
-                        forcedir = forcedir * (1-len/300) * d.Pull;
+                        forcedir = forcedir * (1-len/1000) * d.Pull;
                         projForce += forcedir;
 
                     }
