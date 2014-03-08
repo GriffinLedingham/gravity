@@ -47,6 +47,11 @@ namespace Gravity
         private Vector2 originalPos = Vector2.Zero;
 
         private DeathStar[] DeathStars = new DeathStar[2];
+        private bool pinching = false;
+
+        private float lastScale = 1.0f;
+
+        private float zoom = 1.0f;
 
         public Game1()
         {
@@ -70,7 +75,7 @@ namespace Gravity
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
-            TouchPanel.EnabledGestures = GestureType.Flick;
+            TouchPanel.EnabledGestures = GestureType.Pinch | GestureType.PinchComplete;
             base.Initialize();
         }
 
@@ -132,12 +137,38 @@ namespace Gravity
 
                 camX = 0;
 
+                zoom = 1.0f;
+                lastScale = 1.0f;
+
                 freeMove = false;
             }
 
             Vector2 projForce = Vector2.Zero;
 
-            if (!objectMoving)
+            if (TouchPanel.IsGestureAvailable)
+            {
+                GestureSample gs = TouchPanel.ReadGesture();
+                switch (gs.GestureType)
+                {
+                    case GestureType.Pinch:
+                        
+                        break;
+                    case GestureType.PinchComplete:
+
+                        if (zoom >= 1)
+                        {
+                            zoom = 0.5f;
+                        }
+                        else
+                        {
+                            zoom = 1.0f;
+                        }
+
+                        //blah
+                        break;
+                }
+            }
+            else if (!objectMoving)
             {
                 TouchCollection touchCollection = TouchPanel.GetState();
                 foreach (TouchLocation tl in touchCollection)
@@ -263,7 +294,7 @@ namespace Gravity
 
             Vector3 transVector = new Vector3(camX, camY, 0.0f);
 
-            spriteBatch.Begin(SpriteSortMode.FrontToBack, BlendState.AlphaBlend, null, null, null, null, Matrix.CreateTranslation(transVector) * Matrix.CreateScale(new Vector3(1.0f, 1.0f, 1)));
+            spriteBatch.Begin(SpriteSortMode.FrontToBack, BlendState.AlphaBlend, null, null, null, null, Matrix.CreateTranslation(transVector) * Matrix.CreateScale(new Vector3(zoom, zoom, 1)));
 
             foreach (DeathStar d in DeathStars)
             {
