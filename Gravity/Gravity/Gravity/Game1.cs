@@ -41,6 +41,11 @@ namespace Gravity
         private Body Projectile;
         private Vector2 ProjectileSize = new Vector2(20 * pixelToUnit, 20 * pixelToUnit);
 
+        private bool objectMoving = false;
+        private bool objectDrag = false;
+
+        private Vector2 originalPos = Vector2.Zero;
+
         public Game1()
         {
 
@@ -86,7 +91,7 @@ namespace Gravity
 
             Projectile = BodyFactory.CreateRectangle(world, 20 * pixelToUnit, 20 * pixelToUnit, 10f);
             Projectile.BodyType = BodyType.Dynamic;
-            Projectile.Position = new Vector2(200 * pixelToUnit, 50 * pixelToUnit);
+            Projectile.Position = originalPos = new Vector2(200 * pixelToUnit, 50 * pixelToUnit);
             Projectile.ApplyForce(new Vector2(20, 20));
         }
 
@@ -108,20 +113,66 @@ namespace Gravity
         {
             // Allows the game to exit
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
-                this.Exit();
+            {
+                objectMoving = false;
+                objectDrag = false;
 
-            Vector2 projForce = new Vector2(-0.1f, 0.1f);
+                Projectile.Position = new Vector2(200 * pixelToUnit, 50 * pixelToUnit);
+                Projectile.AngularVelocity = 0;
+                Projectile.LinearVelocity = Vector2.Zero;
+                Projectile.ApplyForce(Vector2.Zero);
+                Projectile.ApplyAngularImpulse(0);
+                Projectile.Rotation = 0;
+            }
 
-            Vector2 forcedir = (Planet.Position + PlanetSize / 2) * unitToPixel - (Projectile.Position + ProjectileSize / 2) * unitToPixel;
-            float len = forcedir.Length();
-            forcedir.Normalize();
+            Vector2 projForce = Vector2.Zero;
 
-            forcedir = forcedir * 0.5f;
+            if (!objectMoving)
+            {
+                TouchCollection touchCollection = TouchPanel.GetState();
+                foreach (TouchLocation tl in touchCollection)
+                {
+                    if ((tl.State == TouchLocationState.Pressed) || (tl.State == TouchLocationState.Moved))
+                    {
 
-            projForce += forcedir;
+                        TouchLocation old;
+
+                        tl.TryGetPreviousLocation(out old);
+                        if (old.Position.X > 0)
+                            Projectile.Position = (Projectile.Position * unitToPixel + (tl.Position - old.Position)) * pixelToUnit;
+                        else
+                            originalPos = tl.Position;
+
+                    }
+                    else if (tl.State == TouchLocationState.Released)
+                    {
+                        objectMoving = true;
+                        objectDrag = false;
+
+                        projForce = originalPos - tl.Position;
+                        float len = projForce.Length() * 4;
+                        projForce.Normalize();
+
+                        projForce = projForce * len * pixelToUnit;
+
+                    }
+                }
+            }
+
+            if (objectMoving)
+            {
+
+                Vector2 forcedir = (Planet.Position + PlanetSize / 2) * unitToPixel - (Projectile.Position + ProjectileSize / 2) * unitToPixel;
+                float len = forcedir.Length();
+                forcedir.Normalize();
+
+                forcedir = forcedir * 0.5f;
+
+                projForce += forcedir;
 
 
-            Projectile.ApplyForce(projForce);
+                Projectile.ApplyForce(projForce);
+            }
 
             world.Step((float)gameTime.ElapsedGameTime.TotalSeconds);
 
