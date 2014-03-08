@@ -157,7 +157,7 @@ namespace Gravity
 
                         if (zoom >= 1)
                         {
-                            zoom = 0.5f;
+                            zoom = 0.25f;
                         }
                         else
                         {
