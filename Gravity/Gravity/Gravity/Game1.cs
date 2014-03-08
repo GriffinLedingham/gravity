@@ -47,7 +47,7 @@ namespace Gravity
         private int windowWidth, windowHeight;
         private float camX, camY;
 
-        private bool projLock = false;
+        private bool freeMove = false;
 
         private Vector2 originalPos = Vector2.Zero;
 
@@ -131,6 +131,12 @@ namespace Gravity
                 Projectile.ApplyForce(Vector2.Zero);
                 Projectile.ApplyAngularImpulse(0);
                 Projectile.Rotation = 0;
+
+                camY = 0;
+
+                camX = 0;
+
+                freeMove = false;
             }
 
             Vector2 projForce = Vector2.Zero;
@@ -158,6 +164,7 @@ namespace Gravity
                         }
                         else
                         {
+
                             if (old.Position.X > 0)
                             {
                                 camX = camX + (tl.Position.X - old.Position.X);
@@ -186,6 +193,32 @@ namespace Gravity
                     }
                 }
             }
+            else
+            {
+                TouchCollection touchCollection = TouchPanel.GetState();
+                foreach (TouchLocation tl in touchCollection)
+                {
+                    if ((tl.State == TouchLocationState.Pressed) || (tl.State == TouchLocationState.Moved))
+                    {
+
+                        TouchLocation old;
+
+                        tl.TryGetPreviousLocation(out old);
+                        Debug.WriteLine(Vector2.Distance(tl.Position - new Vector2(camX, camY), Projectile.Position * unitToPixel));
+                        if (Vector2.Distance(tl.Position - new Vector2(camX, camY), Projectile.Position * unitToPixel) > 100)
+                        {
+                            if (old.Position.X > 0)
+                            {
+                                camX = camX + (tl.Position.X - old.Position.X);
+                                camY = camY + (tl.Position.Y - old.Position.Y);
+                            }
+                            else
+                                originalPos = tl.Position;
+                            freeMove = true;
+                        }
+                    }
+                }
+            }
 
             if (objectMoving)
             {
@@ -204,7 +237,7 @@ namespace Gravity
 
             world.Step((float)gameTime.ElapsedGameTime.TotalSeconds);
 
-            if (objectMoving)
+            if (objectMoving && !freeMove)
             {
                     
                     camY = (int)(-Projectile.Position.Y * unitToPixel + windowHeight / 2.0f);
