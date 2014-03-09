@@ -57,7 +57,7 @@ namespace Gravity
             this.world = world;
 
 
-            Proj = BodyFactory.CreateRectangle(world, ProjectileSize.X, ProjectileSize.Y, 10f);
+            Proj = BodyFactory.CreateRectangle(world, ProjectileSize.X, 200*pixelToUnit, 10f);
             Proj.BodyType = BodyType.Dynamic;
             Proj.Position = pos * pixelToUnit;
 

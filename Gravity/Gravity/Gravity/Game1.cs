@@ -768,32 +768,6 @@ namespace Gravity
                     //spriteBatch.Draw(Game1.Pixi, CurrentProjectile.Position, null, Color.Yellow, CurrentProjectile.Proj.Rotation, new Vector2(Game1.Pixi.Width / 2.0f, Game1.Pixi.Height / 2.0f), CurrentProjectile.Size, SpriteEffects.None, 0);
                     spriteBatch.Draw(Game1.ship, CurrentProjectile.Position, null, Color.White, (float)Math.PI + (float)Math.Atan2(CurrentProjectile.Proj.LinearVelocity.Y, CurrentProjectile.Proj.LinearVelocity.X), new Vector2(Game1.ship.Width / 2.0f, Game1.ship.Height / 2.0f), 0.2f, SpriteEffects.None, 0.0f);
                 }
-                else if(CurrentProjectile == null && myTurn)
-                {
-                    if (playerNum == "one")
-                    {
-
-                        if (CurrentProjectile != null && CurrentProjectile.Proj != null)
-                        {
-                            CurrentProjectile.Proj.OnCollision -= proj_OnCollision;
-                        }
-
-                        CurrentProjectile = new Projectile(new Vector2(20, 20), new Vector2(DS1Pos + 100, 250), world, true);
-                        CurrentProjectile.Proj.OnCollision += proj_OnCollision;
-                    }
-                    else if (playerNum == "two")
-                    {
-
-                        if (CurrentProjectile != null && CurrentProjectile.Proj != null)
-                        {
-                            CurrentProjectile.Proj.OnCollision -= proj_OnCollision;
-                        }
-                        CurrentProjectile = new Projectile(new Vector2(20, 20), new Vector2(DS2Pos - 100, 250), world, true);
-                        CurrentProjectile.Proj.OnCollision += proj_OnCollision;
-                    }
-                    spriteBatch.Draw(Game1.ship, CurrentProjectile.Position, null, Color.White, (float)Math.PI + (float)Math.Atan2(CurrentProjectile.Proj.LinearVelocity.Y, CurrentProjectile.Proj.LinearVelocity.X), new Vector2(Game1.ship.Width / 2.0f, Game1.ship.Height / 2.0f), 0.2f, SpriteEffects.None, 0.0f);
-
-                }
 
                 foreach (DeathStar d in DeathStars)
                 {
