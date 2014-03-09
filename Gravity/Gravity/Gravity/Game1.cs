@@ -207,18 +207,22 @@ namespace Gravity
 
             if (myNewHealth <= 0)
             {
+                reset();
+
                 End.YouWon = false;
                 isGameScreen = false;
+                isMenuScreen = false;
                 isEndScreen = true;
-                reset();
                 return;
             }
             else if(oppNewHealth <= 0)
             {
+                reset();
+
                 End.YouWon = true;
+                isMenuScreen = false;
                 isGameScreen = false;
                 isEndScreen = true;
-                reset();
                 return;
             }
 
