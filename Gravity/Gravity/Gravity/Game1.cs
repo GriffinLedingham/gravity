@@ -19,7 +19,7 @@ using SimpleJson;
 
 namespace Gravity
 {
-    
+
     /// <summary>
     /// This is the main type for your game
     /// </summary>
@@ -109,8 +109,8 @@ namespace Gravity
             {
                 case "fire":
                     handleFire(
-                        float.Parse(msg["vel_y"].ToString()),
-                        float.Parse(msg["vel_y"].ToString()),
+                        float.Parse(msg["force_x"].ToString()),
+                        float.Parse(msg["force_y"].ToString()),
                         float.Parse(msg["pos_x"].ToString()),
                         float.Parse(msg["pos_y"].ToString()));
                     break;
@@ -119,14 +119,12 @@ namespace Gravity
 
 
 
-        void handleFire(float velx, float vely, float posx, float posy)
+        void handleFire(float force_x, float force_y, float posx, float posy)
         {
+            CurrentProjectile = new Projectile(new Vector2(20, 20), new Vector2(posx, posy), world, false);
 
-            LastVelocity = new Vector2(velx, vely);
-            CurrentProjectile.Position = new Vector2(posx, posy);
-            CurrentProjectile.Proj.LinearVelocity = LastVelocity;
-            CurrentProjectile.Mine = false;
-            objectMoving = true;
+            LastVelocity = new Vector2(force_x, force_y);
+            CurrentProjectile.THISVARIABLEFUCKINGSUCKS = true;
         }
 
         /// <summary>
@@ -160,7 +158,7 @@ namespace Gravity
             DeathStars[0] = new DeathStar(new Vector2(100, 100), new Vector2(100, 100), new Vector2(3), world);
             DeathStars[1] = new DeathStar(new Vector2(100, 100), new Vector2(1300, 100), new Vector2(3), world);
 
-            CurrentProjectile = new Projectile(new Vector2(20, 20), new Vector2(400, 250), world, true);
+            CurrentProjectile = new Projectile(new Vector2(20, 20), new Vector2(400, 100), world, false);
 
             windowWidth = Window.ClientBounds.Width;
             windowHeight = Window.ClientBounds.Height;
@@ -268,11 +266,22 @@ namespace Gravity
                     }
                     else if (tl.State == TouchLocationState.Released && objectDrag)
                     {
+                        Debug.WriteLine("Shit dawg");
                         objectMoving = true;
                         objectDrag = false;
 
                         projForce = originalPos - tl.Position;
                         Vector2 oldForce = projForce;
+
+                        JsonObject msg = new JsonObject();
+                        msg["type"] = "fire";
+                        msg["force_x"] = oldForce.X;
+                        msg["force_y"] = oldForce.Y;
+                        msg["pos_x"] = CurrentProjectile.Position.X;
+                        msg["pos_y"] = CurrentProjectile.Position.Y;
+
+                        websocket.Send(SimpleJson.SimpleJson.SerializeObject(msg));
+
                         float len = projForce.Length() * 15;
                         projForce.Normalize();
 
@@ -310,6 +319,24 @@ namespace Gravity
                 }
             }
 
+            if (CurrentProjectile != null && !CurrentProjectile.Mine && CurrentProjectile.THISVARIABLEFUCKINGSUCKS)
+            {
+                objectMoving = true;
+                objectDrag = false;
+
+                projForce = LastVelocity;
+
+                float len = projForce.Length() * 15;
+                projForce.Normalize();
+
+                projForce = projForce * len * pixelToUnit;
+
+                camX = CurrentProjectile.Position.X;
+                camY = CurrentProjectile.Position.Y;
+
+                CurrentProjectile.THISVARIABLEFUCKINGSUCKS = false;
+            }
+
             if (objectMoving)
             {
 
@@ -329,28 +356,14 @@ namespace Gravity
                     }
 
                 }
-                if (CurrentProjectile.Mine)
-                {
-                    CurrentProjectile.Proj.ApplyForce(projForce);
 
-                    JsonObject msg = new JsonObject();
-                    msg["type"] = "fire";
-                    msg["vel_x"] = CurrentProjectile.Proj.LinearVelocity.X;
-                    msg["vel_y"] = CurrentProjectile.Proj.LinearVelocity.Y;
-                    msg["pos_x"] = CurrentProjectile.Position.X;
-                    msg["pos_y"] = CurrentProjectile.Position.Y;
+                CurrentProjectile.Proj.ApplyForce(projForce);
 
-                    websocket.Send(SimpleJson.SimpleJson.SerializeObject(msg));
-                }
-                else
-                {
-                    //CurrentProjectile.Proj.ApplyForce(LastVelocity);
-                }
+
             }
 
 
-
-            world.Step((float)gameTime.ElapsedGameTime.TotalSeconds);
+            world.Step((float)0.03f);
 
             if (objectMoving && !freeMove)
             {
