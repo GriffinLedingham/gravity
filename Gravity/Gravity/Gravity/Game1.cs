@@ -766,7 +766,12 @@ namespace Gravity
             {
                 Menu.render(spriteBatch);
             }
-            else if (isGameScreen){
+            else if (isEndScreen)
+            {
+                End.render(spriteBatch);
+            }
+            else if (isGameScreen)
+            {
 
                 //GAME WORLD
                 spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, null, null, null, null, Matrix.CreateTranslation(transVector) * Matrix.CreateScale(new Vector3(zoom, zoom, 1)));
@@ -785,13 +790,13 @@ namespace Gravity
                     //spriteBatch.Draw(Game1.Pixi, d.CityPosition, null, Color.Green, d.City.Rotation, new Vector2(Game1.Pixi.Width / 2.0f, Game1.Pixi.Height / 2.0f), d.CitySize, SpriteEffects.None, 0);
                     spriteBatch.Draw(towers, d.CityPosition + (d.left ? Vector2.Zero : new Vector2(23, 0)), new Rectangle(0, (d.left) ? 44 : 0, 100, 44), Color.White, 0.0f, new Vector2(towers.Width / 2.0f + 10, towers.Height / 4.0f), 1.0f, d.left ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0.0f);
                 }
-                
+
                 spriteBatch.End();
 
                 //GUI
                 spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);
 
-                spriteBatch.Draw(turnSigns, new Vector2(turnSigns.Width + spriteBatch.GraphicsDevice.DisplayMode.Width + 100, 20) / 4 , new Rectangle(0, myTurn ? 0 : 60, 324, 60), Color.White);
+                spriteBatch.Draw(turnSigns, new Vector2(turnSigns.Width + spriteBatch.GraphicsDevice.DisplayMode.Width + 100, 20) / 4, new Rectangle(0, myTurn ? 0 : 60, 324, 60), Color.White);
 
                 for (int i = 0; i < maxHealth; i++)
                 {
