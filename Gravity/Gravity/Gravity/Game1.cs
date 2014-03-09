@@ -333,10 +333,12 @@ namespace Gravity
                 if (playerNum == "one")
                 {
                     CurrentProjectile = new Projectile(new Vector2(20, 20), new Vector2(DS1Pos + 100, 250), world, true);
+                    CurrentProjectile.Proj.OnCollision += proj_OnCollision;
                 }
                 else if (playerNum == "two")
                 {
                     CurrentProjectile = new Projectile(new Vector2(20, 20), new Vector2(DS2Pos - 100, 250), world, true);
+                    CurrentProjectile.Proj.OnCollision += proj_OnCollision;
                 }
 
                 //THIS FOCUSES ON THE CAMERA WHEN YOU DO A PINCH ZOOM BACK IN, SO WE AREN'T LOST
@@ -365,10 +367,12 @@ namespace Gravity
                 if (playerNum == "one")
                 {
                     CurrentProjectile = new Projectile(new Vector2(20, 20), new Vector2(DS2Pos - 100, 250), world, true);
+                    CurrentProjectile.Proj.OnCollision += proj_OnCollision;
                 }
                 else if (playerNum == "two")
                 {
                     CurrentProjectile = new Projectile(new Vector2(20, 20), new Vector2(DS1Pos + 100, 250), world, true);
+                    CurrentProjectile.Proj.OnCollision += proj_OnCollision;
 
                 }
 
@@ -550,9 +554,7 @@ namespace Gravity
                 }
             }
 
-            if (colliding == false && CurrentProjectile != null)
-                CurrentProjectile.Proj.OnCollision += proj_OnCollision;
-            else
+            if (!(colliding == false && CurrentProjectile != null))
             {
                 Debug.WriteLine("GG PLANET, YOU HIT");
                 betweenTurns = true;
