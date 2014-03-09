@@ -99,13 +99,7 @@ namespace Gravity
 
             // Extend battery life under lock.
             InactiveSleepTime = TimeSpan.FromSeconds(1);
-            websocket = new WebSocket("ws://134.87.140.178:8142/");
-            websocket.EnableAutoSendPing = true;
-            websocket.Opened += websocket_Opened;
-            websocket.Closed += websocket_Closed;
-            websocket.Error += websocket_Error;
-            websocket.MessageReceived += websocket_MessageReceived;
-            websocket.Open();
+            
 
             Menu = new MainMenu();
 
@@ -177,7 +171,6 @@ namespace Gravity
             myTurnPending = val;
             playerNum = num;
             colliding = false;
-
 
             if (playerNum == "one")
             {
@@ -299,9 +292,21 @@ namespace Gravity
                 Menu.Update(touchCollection);
                 if (Menu.StartPress)
                 {
+
+
+
                     isMenuScreen = false;
                     isGameScreen = true;
-                    reset();
+                    Menu.StartPress = false;
+
+                    websocket = new WebSocket("ws://134.87.140.178:8142/");
+                    websocket.EnableAutoSendPing = true;
+                    websocket.Opened += websocket_Opened;
+                    websocket.Closed += websocket_Closed;
+                    websocket.Error += websocket_Error;
+                    websocket.MessageReceived += websocket_MessageReceived;
+                    websocket.Open();
+
                 }
             }
 
