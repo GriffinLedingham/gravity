@@ -168,6 +168,8 @@ namespace Gravity
             betweenTurns = false;
             myTurnPending = val;
             playerNum = num;
+            colliding = false;
+
 
             if (playerNum == "one")
             {
@@ -183,6 +185,7 @@ namespace Gravity
         {
             Debug.WriteLine("Turn changing");
             betweenTurns = false;
+            colliding = false;
             myTurnPending = val;
         }
 
@@ -508,7 +511,6 @@ namespace Gravity
             else
             {
                 Debug.WriteLine("GG PLANET, YOU HIT");
-                colliding = false;
                 betweenTurns = true;
 
                 JsonObject msg = new JsonObject();
