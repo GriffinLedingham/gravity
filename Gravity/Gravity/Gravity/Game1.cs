@@ -32,11 +32,14 @@ namespace Gravity
         public static Texture2D Pixi;
         public static Random Game1Random = new Random();
 
-        private Texture2D backgroundImage = null;
-        private Texture2D planets = null;
-        private Texture2D gameLogo = null;
-        private Texture2D towers = null;
+        public static Texture2D backgroundImage = null;
+        public static Texture2D planets = null;
+        public static  Texture2D gameLogo = null;
+        public static Texture2D towers = null;
         public static Texture2D ship = null;
+        public static Texture2D menuSprites = null;
+
+        public static SpriteFont gameFont = null;
 
         const float unitToPixel = 100.0f;
         const float pixelToUnit = 1 / unitToPixel;
@@ -223,6 +226,9 @@ namespace Gravity
             gameLogo = Content.Load<Texture2D>("logo");
             towers = Content.Load<Texture2D>("towers");
             ship = Content.Load<Texture2D>("corgiShip");
+            menuSprites = Content.Load<Texture2D>("menusprites");
+
+            gameFont = Content.Load<SpriteFont>("SpriteFont1");
 
             world = new World(new Vector2(0, 0)); // Grav 0 cause we in space hommie
 
@@ -296,7 +302,7 @@ namespace Gravity
             {
                 TouchCollection touchCollection = TouchPanel.GetState();
 
-                Menu.Update(touchCollection);
+                Menu.Update(touchCollection, gameTime);
                 if (Menu.StartPress)
                 {
 
