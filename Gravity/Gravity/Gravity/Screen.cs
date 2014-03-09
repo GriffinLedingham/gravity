@@ -134,17 +134,18 @@ namespace Gravity
 
             if (YouWon)
             {
+                sb.Draw(Game1.winner, new Rectangle(-4000 - (int)((colourDelta / 10) % 2000), -3500, 8000, 7000), Color.Green);
 
                 sb.Draw(Game1.spaceCorgi, new Vector2(120, 400), null, Color.White, 0.0f, new Vector2(45, 37) / 2, 3.0f, SpriteEffects.None, 0.5f);
-
-                sb.Draw(Game1.youWin, new Vector2(Game1.youWin.Width + sb.GraphicsDevice.DisplayMode.Width, Game1.youWin.Height + sb.GraphicsDevice.DisplayMode.Height / 4), Color.White);
+                sb.Draw(Game1.youWin, new Vector2(20), Color.White);
             }
             else
             {
+                sb.Draw(Game1.loser, new Rectangle(-4000 - (int)((colourDelta / 10) % 2000), -3500, 8000, 7000), Color.Purple);
 
                 sb.Draw(Game1.spaceCorgi, new Vector2(120, 400), null, Color.White, 0.0f, new Vector2(45, 37) / 2, 3.0f, SpriteEffects.FlipVertically, 0.5f);
 
-                sb.Draw(Game1.youLose, new Vector2(Game1.youLose.Width + sb.GraphicsDevice.DisplayMode.Width, Game1.youLose.Height + sb.GraphicsDevice.DisplayMode.Height / 4), Color.White);
+                sb.Draw(Game1.youLose, new Vector2(20), Color.White);
             }
 
             sb.End();
