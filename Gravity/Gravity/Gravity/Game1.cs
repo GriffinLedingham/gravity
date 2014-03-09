@@ -20,7 +20,7 @@ using FarseerPhysics.Dynamics.Contacts;
 
 namespace Gravity
 {
-    
+
     /// <summary>
     /// This is the main type for your game
     /// </summary>
@@ -31,6 +31,9 @@ namespace Gravity
 
         public static Texture2D Pixi;
         public static Random Game1Random = new Random();
+
+        private Texture2D backgroundImage = null;
+        private Texture2D planets = null;
 
         const float unitToPixel = 100.0f;
         const float pixelToUnit = 1 / unitToPixel;
@@ -118,8 +121,8 @@ namespace Gravity
             {
                 case "fire":
                     handleFire(
-                        float.Parse(msg["vel_y"].ToString()),
-                        float.Parse(msg["vel_y"].ToString()),
+                        float.Parse(msg["force_x"].ToString()),
+                        float.Parse(msg["force_y"].ToString()),
                         float.Parse(msg["pos_x"].ToString()),
                         float.Parse(msg["pos_y"].ToString()));
                     break;
@@ -134,13 +137,12 @@ namespace Gravity
 
 
 
-        void handleFire(float velx, float vely, float posx, float posy)
+        void handleFire(float force_x, float force_y, float posx, float posy)
         {
+            CurrentProjectile = new Projectile(new Vector2(20, 20), new Vector2(posx, posy), world, false);
 
-            LastVelocity = new Vector2(velx, vely);
-            CurrentProjectile.Position = new Vector2(posx, posy);
-            CurrentProjectile.Mine = false;
-            objectMoving = true;
+            LastVelocity = new Vector2(force_x, force_y);
+            CurrentProjectile.THISVARIABLEFUCKINGSUCKS = true;
         }
 
         void handleAuth(string val, string num)
@@ -180,6 +182,8 @@ namespace Gravity
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
             Pixi = Content.Load<Texture2D>("pixi");
+            backgroundImage = Content.Load<Texture2D>("background");
+            planets = Content.Load<Texture2D>("planets");
 
             world = new World(new Vector2(0, 0)); // Grav 0 cause we in space hommie
 
@@ -270,9 +274,7 @@ namespace Gravity
 
                 Projectiles.Clear();
 
-                camY = 0;
-
-                camX = 0;
+                
 
                 zoom = 1.0f;
                 lastScale = 1.0f;
@@ -293,6 +295,9 @@ namespace Gravity
                     CurrentProjectile = new Projectile(new Vector2(20, 20), new Vector2(200, 250), world, true);
 
                 }
+
+                camY = (int)(-CurrentProjectile.Position.Y + windowHeight / 2.0f);
+                camX = (int)(-CurrentProjectile.Position.X + windowWidth / 2.0f);
             }
 
             Vector2 projForce = Vector2.Zero;
@@ -314,13 +319,15 @@ namespace Gravity
                         else
                         {
                             zoom = 1.0f;
+                            camY = (int)(-CurrentProjectile.Position.Y + windowHeight / 2.0f);
+                            camX = (int)(-CurrentProjectile.Position.X + windowWidth / 2.0f);
                         }
 
                         //blah
                         break;
                 }
             }
-            else if (!objectMoving && myTurn == true)
+            else if (!objectMoving) //&& myTurn == true)
             {
                 TouchCollection touchCollection = TouchPanel.GetState();
                 foreach (TouchLocation tl in touchCollection)
@@ -357,11 +364,22 @@ namespace Gravity
                     }
                     else if (tl.State == TouchLocationState.Released && objectDrag)
                     {
+                        Debug.WriteLine("Shit dawg");
                         objectMoving = true;
                         objectDrag = false;
 
                         projForce = originalPos - tl.Position;
                         Vector2 oldForce = projForce;
+
+                        JsonObject msg = new JsonObject();
+                        msg["type"] = "fire";
+                        msg["force_x"] = oldForce.X;
+                        msg["force_y"] = oldForce.Y;
+                        msg["pos_x"] = CurrentProjectile.Position.X;
+                        msg["pos_y"] = CurrentProjectile.Position.Y;
+
+                        websocket.Send(SimpleJson.SimpleJson.SerializeObject(msg));
+
                         float len = projForce.Length() * 15;
                         projForce.Normalize();
 
@@ -399,6 +417,24 @@ namespace Gravity
                 }
             }
 
+            if (CurrentProjectile != null && !CurrentProjectile.Mine && CurrentProjectile.THISVARIABLEFUCKINGSUCKS)
+            {
+                objectMoving = true;
+                objectDrag = false;
+
+                projForce = LastVelocity;
+
+                float len = projForce.Length() * 15;
+                projForce.Normalize();
+
+                projForce = projForce * len * pixelToUnit;
+
+                camX = CurrentProjectile.Position.X;
+                camY = CurrentProjectile.Position.Y;
+
+                CurrentProjectile.THISVARIABLEFUCKINGSUCKS = false;
+            }
+
             if (objectMoving)
             {
 
@@ -418,30 +454,14 @@ namespace Gravity
                     }
 
                 }
-                if (CurrentProjectile.Mine)
-                {
-                    CurrentProjectile.Proj.ApplyForce(projForce);
-
-                    JsonObject msg = new JsonObject();
-                    msg["type"] = "fire";
-                    msg["vel_x"] = projForce.X;
-                    msg["vel_y"] = projForce.Y;
-                    msg["pos_x"] = CurrentProjectile.Position.X;
-                    msg["pos_y"] = CurrentProjectile.Position.Y;
-
-                    websocket.Send(SimpleJson.SimpleJson.SerializeObject(msg));
-                }
-                else
-                {
-                    CurrentProjectile.Proj.ApplyForce(LastVelocity);
-                }
+                CurrentProjectile.Proj.ApplyForce(projForce);
             }
 
             if (colliding == false && CurrentProjectile != null)
                 CurrentProjectile.Proj.OnCollision += proj_OnCollision;
             else
             {
-                Debug.WriteLine("Game Over");
+                Debug.WriteLine("GG PLANET, YOU HIT");
                 colliding = false;
                 betweenTurns = true;
 
@@ -456,13 +476,9 @@ namespace Gravity
                 playerHit = 0;
 
                 websocket.Send(SimpleJson.SimpleJson.SerializeObject(msg));
-
-
-
             }
-            world.Step((float)gameTime.ElapsedGameTime.TotalSeconds);
 
-
+            world.Step((float)0.03f);
 
             if (objectMoving && !freeMove)
             {
@@ -503,12 +519,14 @@ namespace Gravity
 
             Vector3 transVector = new Vector3(camX, camY, 0.0f);
 
-            spriteBatch.Begin(SpriteSortMode.FrontToBack, BlendState.AlphaBlend, null, null, null, null, Matrix.CreateTranslation(transVector) * Matrix.CreateScale(new Vector3(zoom, zoom, 1)));
+            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, null, null, null, null, Matrix.CreateTranslation(transVector) * Matrix.CreateScale(new Vector3(zoom, zoom, 1)));
+
+            spriteBatch.Draw(backgroundImage, new Rectangle(-4000, -3500, 8000, 7000), Color.White);
 
             foreach (DeathStar d in DeathStars)
             {
-                spriteBatch.Draw(Game1.Pixi, d.Position, null, Color.Red, d.Planet.Rotation, new Vector2(Game1.Pixi.Width / 2.0f, Game1.Pixi.Height / 2.0f), d.Size, SpriteEffects.None, 0);
-
+                //spriteBatch.Draw(Game1.Pixi, d.Position, null, Color.Red, d.Planet.Rotation, new Vector2(Game1.Pixi.Width / 2.0f, Game1.Pixi.Height / 2.0f), d.Size, SpriteEffects.None, 0);
+                spriteBatch.Draw(planets, d.Position - new Vector2(50), new Rectangle(100 * d.index, 0, 100, 100), Color.White);
             }
             if (CurrentProjectile != null)
                 spriteBatch.Draw(Game1.Pixi, CurrentProjectile.Position, null, Color.Yellow, CurrentProjectile.Proj.Rotation, new Vector2(Game1.Pixi.Width / 2.0f, Game1.Pixi.Height / 2.0f), CurrentProjectile.Size, SpriteEffects.None, 0);

@@ -19,6 +19,8 @@ namespace Gravity
         public Vector2 Pull {get;set;}
         public World world;
 
+        public int index = 0;
+
         public Vector2 Position
         {
             get
@@ -51,7 +53,10 @@ namespace Gravity
 
             this.Pull = pull;
 
-            Planet = BodyFactory.CreateRectangle(world, PlanetSize.X, PlanetSize.Y, 10f);
+            index = Game1.Game1Random.Next() % 3;
+
+            //Planet = BodyFactory.CreateRectangle(world, PlanetSize.X, PlanetSize.Y, 10f);
+            Planet = BodyFactory.CreateCircle(world, PlanetSize.X / 2, 10f);
             Planet.BodyType = BodyType.Static;
             Planet.Position = pos * pixelToUnit;
 
