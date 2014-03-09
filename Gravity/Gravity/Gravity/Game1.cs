@@ -58,7 +58,9 @@ namespace Gravity
         private List<Projectile> Projectiles = new List<Projectile>();
 
         private Projectile CurrentProjectile = null;
-        
+
+        private Vector2 LastVelocity;
+
         public Game1()
         {
 
@@ -70,7 +72,7 @@ namespace Gravity
 
             // Extend battery life under lock.
             InactiveSleepTime = TimeSpan.FromSeconds(1);
-            websocket = new WebSocket("ws://192.168.0.150:8142/");
+            websocket = new WebSocket("ws://192.168.1.168:8142/");
             websocket.EnableAutoSendPing = true;
             websocket.Opened += websocket_Opened;
             websocket.Closed += websocket_Closed;
@@ -117,9 +119,10 @@ namespace Gravity
         void handleFire(float velx, float vely, float posx, float posy)
         {
 
-            CurrentProjectile.Proj.LinearVelocity = new Vector2(velx, vely);
-
+            LastVelocity = new Vector2(velx, vely);
             CurrentProjectile.Position = new Vector2(posx, posy);
+            CurrentProjectile.Mine = false;
+            objectMoving = true;
         }
 
         /// <summary>
@@ -188,6 +191,9 @@ namespace Gravity
 
                 zoom = 1.0f;
                 lastScale = 1.0f;
+
+                LastVelocity = Vector2.Zero;
+
 
                 freeMove = false;
                 CurrentProjectile = new Projectile(new Vector2(20, 20), new Vector2(400, 250), world, true);
@@ -317,26 +323,26 @@ namespace Gravity
                     }
 
                 }
-                if (!float.IsNaN(projForce.X))
+                if (CurrentProjectile.Mine)
+                {
                     CurrentProjectile.Proj.ApplyForce(projForce);
 
-                if (i == 0)
-                {
                     JsonObject msg = new JsonObject();
                     msg["type"] = "fire";
-                    msg["vel_x"] = CurrentProjectile.Proj.LinearVelocity.X;
-                    msg["vel_y"] = CurrentProjectile.Proj.LinearVelocity.Y;
+                    msg["vel_x"] = projForce.X;
+                    msg["vel_y"] = projForce.Y;
                     msg["pos_x"] = CurrentProjectile.Position.X;
                     msg["pos_y"] = CurrentProjectile.Position.Y;
 
                     websocket.Send(SimpleJson.SimpleJson.SerializeObject(msg));
-                    i++;
                 }
                 else
                 {
-                    i = (i + 1) % 2;
+                    CurrentProjectile.Proj.ApplyForce(LastVelocity);
                 }
             }
+
+
 
             world.Step((float)gameTime.ElapsedGameTime.TotalSeconds);
 
