@@ -82,6 +82,11 @@ namespace Gravity
         public int DS1Pos = 200;
         public int DS2Pos = 1400;
 
+        public bool isMenuScreen = true;
+        public bool isGameScreen = false;
+
+        public MainMenu Menu;
+
         public Game1()
         {
 
@@ -100,6 +105,8 @@ namespace Gravity
             websocket.Error += websocket_Error;
             websocket.MessageReceived += websocket_MessageReceived;
             websocket.Open();
+
+            Menu = new MainMenu();
 
         }
 
@@ -219,6 +226,8 @@ namespace Gravity
 
             world = new World(new Vector2(0, 0)); // Grav 0 cause we in space hommie
 
+            Menu.Load(Content);
+
             DeathStars[0] = new DeathStar(new Vector2(100, 100), new Vector2(DS1Pos, 100), new Vector2(3), world, true);
             DeathStars[1] = new DeathStar(new Vector2(100, 100), new Vector2(DS2Pos, 100), new Vector2(3), world, false);
 
@@ -238,6 +247,27 @@ namespace Gravity
             // TODO: Unload any non ContentManager content here
         }
 
+        private void reset()
+        {
+            objectMoving = false;
+            objectDrag = false;
+
+            Projectiles.Clear();
+
+            camY = 0;
+
+            camX = 0;
+
+            zoom = 1.0f;
+            lastScale = 1.0f;
+
+            LastVelocity = Vector2.Zero;
+
+
+            freeMove = false;
+
+        }
+
         /// <summary>
         /// Allows the game to run logic such as updating the world,
         /// checking for collisions, gathering input, and playing audio.
@@ -245,30 +275,37 @@ namespace Gravity
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
-            if (betweenTurns)
-                return;
+
             // Allows the game to exit
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
             {
-                objectMoving = false;
-                objectDrag = false;
-
-                Projectiles.Clear();
-
-                camY = 0;
-
-                camX = 0;
-
-                zoom = 1.0f;
-                lastScale = 1.0f;
-
-                LastVelocity = Vector2.Zero;
-
-
-                freeMove = false;
-                CurrentProjectile = new Projectile(new Vector2(20, 20), new Vector2(DS1Pos + 200, 250), world, true);
-
+                if (!isMenuScreen)
+                {
+                    isGameScreen = false;
+                    isMenuScreen = true;
+                }
+                else
+                {
+                    Exit();
+                }
             }
+
+            if (isMenuScreen)
+            {
+                TouchCollection touchCollection = TouchPanel.GetState();
+
+                Menu.Update(touchCollection);
+                if (Menu.StartPress)
+                {
+                    isMenuScreen = false;
+                    isGameScreen = true;
+                    reset();
+                }
+            }
+
+            if (betweenTurns)
+                return;
+
             if (myTurnPending == "true")
             {
                 objectMoving = false;
@@ -604,22 +641,29 @@ namespace Gravity
 
             Vector3 transVector = new Vector3(camX, camY, 0.0f);
 
-            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, null, null, null, null, Matrix.CreateTranslation(transVector) * Matrix.CreateScale(new Vector3(zoom, zoom, 1)));
-
-            spriteBatch.Draw(backgroundImage, new Rectangle(-4000, -3500, 8000, 7000), Color.White);
-
-            foreach (DeathStar d in DeathStars)
+            if (isMenuScreen)
             {
-                //spriteBatch.Draw(Game1.Pixi, d.Position, null, Color.Red, d.Planet.Rotation, new Vector2(Game1.Pixi.Width / 2.0f, Game1.Pixi.Height / 2.0f), d.Size, SpriteEffects.None, 0);
-                spriteBatch.Draw(planets, d.Position - new Vector2(50), new Rectangle(100 * d.index, 0, 100, 100), Color.White);
-                //spriteBatch.Draw(Game1.Pixi, d.CityPosition, null, Color.Green, d.City.Rotation, new Vector2(Game1.Pixi.Width / 2.0f, Game1.Pixi.Height / 2.0f), d.CitySize, SpriteEffects.None, 0);
-                spriteBatch.Draw(towers, d.CityPosition + (d.left ? Vector2.Zero : new Vector2(23, 0)), new Rectangle(0, (d.left) ? 44 : 0, 100, 44), Color.White, 0.0f, new Vector2(towers.Width / 2.0f + 10, towers.Height / 4.0f), 1.0f, d.left ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0.0f);
+                Menu.render(spriteBatch);
             }
-            if (CurrentProjectile != null)
-                spriteBatch.Draw(Game1.Pixi, CurrentProjectile.Position, null, Color.Yellow, CurrentProjectile.Proj.Rotation, new Vector2(Game1.Pixi.Width / 2.0f, Game1.Pixi.Height / 2.0f), CurrentProjectile.Size, SpriteEffects.None, 0);
+            else if (isGameScreen)
+            {
 
-            spriteBatch.End();
+                spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, null, null, null, null, Matrix.CreateTranslation(transVector) * Matrix.CreateScale(new Vector3(zoom, zoom, 1)));
 
+                spriteBatch.Draw(backgroundImage, new Rectangle(-4000, -3500, 8000, 7000), Color.White);
+
+                foreach (DeathStar d in DeathStars)
+                {
+                    //spriteBatch.Draw(Game1.Pixi, d.Position, null, Color.Red, d.Planet.Rotation, new Vector2(Game1.Pixi.Width / 2.0f, Game1.Pixi.Height / 2.0f), d.Size, SpriteEffects.None, 0);
+                    spriteBatch.Draw(planets, d.Position - new Vector2(50), new Rectangle(100 * d.index, 0, 100, 100), Color.White);
+                    //spriteBatch.Draw(Game1.Pixi, d.CityPosition, null, Color.Green, d.City.Rotation, new Vector2(Game1.Pixi.Width / 2.0f, Game1.Pixi.Height / 2.0f), d.CitySize, SpriteEffects.None, 0);
+                    spriteBatch.Draw(towers, d.CityPosition + (d.left ? Vector2.Zero : new Vector2(23, 0)), new Rectangle(0, (d.left) ? 44 : 0, 100, 44), Color.White, 0.0f, new Vector2(towers.Width / 2.0f + 10, towers.Height / 4.0f), 1.0f, d.left ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0.0f);
+                }
+                if (CurrentProjectile != null)
+                    spriteBatch.Draw(Game1.Pixi, CurrentProjectile.Position, null, Color.Yellow, CurrentProjectile.Proj.Rotation, new Vector2(Game1.Pixi.Width / 2.0f, Game1.Pixi.Height / 2.0f), CurrentProjectile.Size, SpriteEffects.None, 0);
+
+                spriteBatch.End();
+            }
             base.Draw(gameTime);
         }
     }
