@@ -121,7 +121,7 @@ namespace Gravity
 
         void handleFire(float velx, float vely, float posx, float posy)
         {
-
+            if (CurrentProjectile == null) return;
             LastVelocity = new Vector2(posx, posy);
 
             CurrentProjectile.Mine = false;
@@ -332,14 +332,17 @@ namespace Gravity
                 {
                     CurrentProjectile.Proj.ApplyForce(projForce);
 
-                    JsonObject msg = new JsonObject();
-                    msg["type"] = "fire";
-                    msg["vel_x"] = CurrentProjectile.Proj.LinearVelocity.X;
-                    msg["vel_y"] = CurrentProjectile.Proj.LinearVelocity.Y;
-                    msg["pos_x"] = CurrentProjectile.Position.X;
-                    msg["pos_y"] = CurrentProjectile.Position.Y;
 
-                    websocket.Send(SimpleJson.SimpleJson.SerializeObject(msg));
+                        JsonObject msg = new JsonObject();
+                        msg["type"] = "fire";
+                        msg["vel_x"] = CurrentProjectile.Proj.LinearVelocity.X;
+                        msg["vel_y"] = CurrentProjectile.Proj.LinearVelocity.Y;
+                        msg["pos_x"] = CurrentProjectile.Position.X;
+                        msg["pos_y"] = CurrentProjectile.Position.Y;
+
+                        websocket.Send(SimpleJson.SimpleJson.SerializeObject(msg));
+                        i++;
+
                 }
                 else
                 {
@@ -348,8 +351,8 @@ namespace Gravity
             }
 
 
-
-            world.Step((float)gameTime.ElapsedGameTime.TotalSeconds);
+            Debug.WriteLine((float)gameTime.ElapsedGameTime.TotalSeconds);
+            world.Step((float)0.03f);
 
             if (objectMoving && !freeMove)
             {
