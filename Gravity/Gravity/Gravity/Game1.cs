@@ -159,6 +159,9 @@ namespace Gravity
                 case "kill":
                     betweenTurns = true;
                     break;
+                case "reset":
+                    reset();
+                    break;
             }
         }
 
@@ -283,18 +286,24 @@ namespace Gravity
             objectDrag = false;
 
             Projectiles.Clear();
-
-            camY = 0;
-
-            camX = 0;
+            myTurn = false;
 
             zoom = 1.0f;
             lastScale = 1.0f;
 
             LastVelocity = Vector2.Zero;
 
+            myTurnPending = null;
+            myTurn = true;
 
             freeMove = false;
+
+            camY = 0;
+
+            camX = 0;
+            isGameScreen = false;
+            isEndScreen = false;
+            isMenuScreen = true;
 
         }
 
@@ -322,6 +331,7 @@ namespace Gravity
                         websocket.Close();
                     Exit();
                 }
+                reset();
             }
 
             if (isMenuScreen)
