@@ -524,8 +524,8 @@ namespace Gravity
 
                 projForce = projForce * len * pixelToUnit;
 
-                camX = CurrentProjectile.Position.X;
-                camY = CurrentProjectile.Position.Y;
+                camY = (int)(-CurrentProjectile.Position.Y + windowHeight / 2.0f);
+                camX = (int)(-CurrentProjectile.Position.X + windowWidth / 2.0f);
 
                 CurrentProjectile.THISVARIABLEFUCKINGSUCKS = false;
             }
