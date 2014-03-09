@@ -398,6 +398,11 @@ namespace Gravity
                         camX = CurrentProjectile.Position.X;
                         camY = CurrentProjectile.Position.Y;
 
+                        JsonObject msg = new JsonObject();
+                        msg["type"] = "initialFire";
+
+                        websocket.Send(SimpleJson.SimpleJson.SerializeObject(msg));
+
                     }
                 }
             }
