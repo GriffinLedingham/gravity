@@ -1,13 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.21005.1
-MinimumVisualStudioVersion = 10.0.40219.1
+# Visual Studio Express 2012 for Windows Phone
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gravity", "Gravity\Gravity\Gravity.csproj", "{968959C0-66C1-442C-A010-B6A69ED8B547}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GravityContent", "Gravity\GravityContent\GravityContent.contentproj", "{BD18D752-81CA-4FDA-BB51-9950DA00D56C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Farseer Physics WP7", "Farseer Physics Engine 3.5\Farseer Physics WP7.csproj", "{4DA8DC0C-EC1E-4C31-8B00-9C0DB87C5D0A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Farseer Physics WP7", "..\..\..\..\..\Downloads\Farseer Physics Engine 3.5 Samples (1)\Farseer Physics Engine 3.5 Samples\Farseer Physics Engine 3.5\Farseer Physics WP7.csproj", "{4DA8DC0C-EC1E-4C31-8B00-9C0DB87C5D0A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

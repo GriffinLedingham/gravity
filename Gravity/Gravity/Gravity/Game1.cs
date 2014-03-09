@@ -19,6 +19,15 @@ using SimpleJson;
 
 namespace Gravity
 {
+
+    public struct lastThing
+    {
+        public  Vector2 Pos;
+        public Vector2 Vel;
+        public bool lol = false;
+    }
+
+    
     /// <summary>
     /// This is the main type for your game
     /// </summary>
@@ -57,7 +66,8 @@ namespace Gravity
         private List<Projectile> Projectiles = new List<Projectile>();
 
         private Projectile CurrentProjectile = null;
-
+        private lastThing Last = new lastThing();
+        
         public Game1()
         {
 
@@ -106,6 +116,8 @@ namespace Gravity
                         float.Parse(msg["angle"].ToString()),
                         float.Parse(msg["force_x"].ToString()),
                         float.Parse(msg["force_y"].ToString()),
+                        float.Parse(msg["vel_y"].ToString()),
+                        float.Parse(msg["vel_y"].ToString()),
                         float.Parse(msg["pos_x"].ToString()),
                         float.Parse(msg["pos_y"].ToString()));
                     break;
@@ -114,8 +126,13 @@ namespace Gravity
 
 
 
-        void handleFire(float angle, float forcex, float forcey, float posx, float posy)
+        void handleFire(float angle, float forcex, float forcey, float velx, float vely, float posx, float posy)
         {
+
+            Last.Pos = new Vector2(posx, posy);
+            Last.Vel = new Vector2(velx, vely);
+            Last.lol = true;
+            CurrentProjectile.Proj.LinearVelocity = new Vector2(velx, vely);
             CurrentProjectile.Position = new Vector2(posx, posy);
             CurrentProjectile.THISVARIABLEFUCKINGSUCKS = true;
             CurrentProjectile.Force = new Vector2(forcex, forcey);
@@ -273,6 +290,8 @@ namespace Gravity
                         msg["angle"] = 0;
                         msg["force_x"] = oldForce.X;
                         msg["force_y"] = oldForce.Y;
+                        msg["vel_x"] = CurrentProjectile.Proj.LinearVelocity.X;
+                        msg["vel_y"] = CurrentProjectile.Proj.LinearVelocity.Y;
                         msg["pos_x"] = CurrentProjectile.Position.X;
                         msg["pos_y"] = CurrentProjectile.Position.Y;
 
@@ -306,9 +325,25 @@ namespace Gravity
                     }
                 }
             }
+/*
+            if (!CurrentProjectile.Mine && CurrentProjectile.THISVARIABLEFUCKINGSUCKS)
+            {
+                objectMoving = false;
+                objectDrag = false;
 
+                projForce = CurrentProjectile.Force;
+                float len = projForce.Length() * 15;
+                projForce.Normalize();
 
+                projForce = projForce * len * pixelToUnit;
 
+                camX = CurrentProjectile.Position.X;
+                camY = CurrentProjectile.Position.Y;
+
+                CurrentProjectile.THISVARIABLEFUCKINGSUCKS = false;
+
+            }
+            */
             if (objectMoving)
             {
 
@@ -336,6 +371,8 @@ namespace Gravity
                 msg["angle"] = 0;
                 msg["force_x"] = 0;
                 msg["force_y"] = 0;
+                msg["vel_x"] = CurrentProjectile.Proj.LinearVelocity.X;
+                msg["vel_y"] = CurrentProjectile.Proj.LinearVelocity.Y;
                 msg["pos_x"] = CurrentProjectile.Position.X;
                 msg["pos_y"] = CurrentProjectile.Position.Y;
 
