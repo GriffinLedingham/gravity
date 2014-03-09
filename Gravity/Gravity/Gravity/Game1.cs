@@ -121,6 +121,7 @@ namespace Gravity
 
             LastVelocity = new Vector2(velx, vely);
             CurrentProjectile.Position = new Vector2(posx, posy);
+            CurrentProjectile.Proj.LinearVelocity = LastVelocity;
             CurrentProjectile.Mine = false;
             objectMoving = true;
         }
@@ -329,8 +330,8 @@ namespace Gravity
 
                     JsonObject msg = new JsonObject();
                     msg["type"] = "fire";
-                    msg["vel_x"] = projForce.X;
-                    msg["vel_y"] = projForce.Y;
+                    msg["vel_x"] = CurrentProjectile.Proj.LinearVelocity.X;
+                    msg["vel_y"] = CurrentProjectile.Proj.LinearVelocity.Y;
                     msg["pos_x"] = CurrentProjectile.Position.X;
                     msg["pos_y"] = CurrentProjectile.Position.Y;
 
@@ -338,7 +339,7 @@ namespace Gravity
                 }
                 else
                 {
-                    CurrentProjectile.Proj.ApplyForce(LastVelocity);
+                    //CurrentProjectile.Proj.ApplyForce(LastVelocity);
                 }
             }
 
