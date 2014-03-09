@@ -120,11 +120,12 @@ namespace Gravity
             switch (type)
             {
                 case "fire":
-                    handleFire(
-                        float.Parse(msg["force_x"].ToString()),
-                        float.Parse(msg["force_y"].ToString()),
-                        float.Parse(msg["pos_x"].ToString()),
-                        float.Parse(msg["pos_y"].ToString()));
+                    CurrentProjectile.Proj = SimpleJson.SimpleJson.DeserializeObject<Body>(msg["obj"].ToString());
+
+                    Debug.WriteLine(CurrentProjectile.Proj);
+
+                    objectMoving = true;
+                        
                     break;
                 case "auth":
                     handleAuth((string)msg["mine"], (string)msg["number"]);
@@ -303,7 +304,7 @@ namespace Gravity
 
             Vector2 projForce = Vector2.Zero;
 
-            if (TouchPanel.IsGestureAvailable && myTurn == false) //THIS IS SO YOU CAN ONLY PINCH ZOOM OUT ON OPPONENT'S TURN
+            if (TouchPanel.IsGestureAvailable && (myTurn == false || objectMoving)) //THIS IS SO YOU CAN ONLY PINCH ZOOM OUT ON OPPONENT'S TURN
             {
                 GestureSample gs = TouchPanel.ReadGesture();
                 switch (gs.GestureType)
@@ -371,15 +372,6 @@ namespace Gravity
 
                         projForce = originalPos - tl.Position;
                         Vector2 oldForce = projForce;
-
-                        JsonObject msg = new JsonObject();
-                        msg["type"] = "fire";
-                        msg["force_x"] = oldForce.X;
-                        msg["force_y"] = oldForce.Y;
-                        msg["pos_x"] = CurrentProjectile.Position.X;
-                        msg["pos_y"] = CurrentProjectile.Position.Y;
-
-                        websocket.Send(SimpleJson.SimpleJson.SerializeObject(msg));
 
                         float len = projForce.Length() * 15;
                         projForce.Normalize();
@@ -456,6 +448,11 @@ namespace Gravity
 
                 }
                 CurrentProjectile.Proj.ApplyForce(projForce);
+                JsonObject msg = new JsonObject();
+                msg["type"] = "fire";
+                msg["obj"] = SimpleJson.SimpleJson.SerializeObject(CurrentProjectile.Proj);
+
+                websocket.Send(SimpleJson.SimpleJson.SerializeObject(msg));
             }
 
             if (colliding == false && CurrentProjectile != null)
