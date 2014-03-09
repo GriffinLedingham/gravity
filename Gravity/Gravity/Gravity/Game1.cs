@@ -31,6 +31,9 @@ namespace Gravity
         public static Texture2D Pixi;
         public static Random Game1Random = new Random();
 
+        private Texture2D backgroundImage = null;
+        private Texture2D planets = null;
+
         const float unitToPixel = 100.0f;
         const float pixelToUnit = 1 / unitToPixel;
 
@@ -149,6 +152,8 @@ namespace Gravity
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
             Pixi = Content.Load<Texture2D>("pixi");
+            backgroundImage = Content.Load<Texture2D>("background");
+            planets = Content.Load<Texture2D>("planets");
 
             world = new World(new Vector2(0, 0)); // Grav 0 cause we in space hommie
 
@@ -371,12 +376,14 @@ namespace Gravity
 
             Vector3 transVector = new Vector3(camX, camY, 0.0f);
 
-            spriteBatch.Begin(SpriteSortMode.FrontToBack, BlendState.AlphaBlend, null, null, null, null, Matrix.CreateTranslation(transVector) * Matrix.CreateScale(new Vector3(zoom, zoom, 1)));
+            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, null, null, null, null, Matrix.CreateTranslation(transVector) * Matrix.CreateScale(new Vector3(zoom, zoom, 1)));
+
+            spriteBatch.Draw(backgroundImage, new Rectangle(-4000, -3500, 8000, 7000), Color.White);
 
             foreach (DeathStar d in DeathStars)
             {
-                spriteBatch.Draw(Game1.Pixi, d.Position, null, Color.Red, d.Planet.Rotation, new Vector2(Game1.Pixi.Width / 2.0f, Game1.Pixi.Height / 2.0f), d.Size, SpriteEffects.None, 0);
-
+                //spriteBatch.Draw(Game1.Pixi, d.Position, null, Color.Red, d.Planet.Rotation, new Vector2(Game1.Pixi.Width / 2.0f, Game1.Pixi.Height / 2.0f), d.Size, SpriteEffects.None, 0);
+                spriteBatch.Draw(planets, d.Position - new Vector2(50), new Rectangle(100 * d.index, 0, 100, 100), Color.White);
             }
             if (CurrentProjectile != null)
                 spriteBatch.Draw(Game1.Pixi, CurrentProjectile.Position, null, Color.Yellow, CurrentProjectile.Proj.Rotation, new Vector2(Game1.Pixi.Width / 2.0f, Game1.Pixi.Height / 2.0f), CurrentProjectile.Size, SpriteEffects.None, 0);
