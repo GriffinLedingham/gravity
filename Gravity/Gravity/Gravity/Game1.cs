@@ -39,6 +39,8 @@ namespace Gravity
         public static Texture2D ship = null;
         public static Texture2D menuSprites = null;
         public static Texture2D turnSigns = null;
+        public static Texture2D winner = null;
+        public static Texture2D loser = null;
 
         public static SpriteFont gameFont = null;
 
@@ -89,9 +91,13 @@ namespace Gravity
 
         public bool isMenuScreen = true;
         public bool isGameScreen = false;
+        public bool isEndScreen = false;
+
+        private int myHealth = 6;
+        private int oppHealth = 6;
 
         public MainMenu Menu;
-
+        public EndScreen End;
         public Game1()
         {
 
@@ -106,6 +112,7 @@ namespace Gravity
             
 
             Menu = new MainMenu();
+            End = new EndScreen();
 
         }
 
@@ -147,7 +154,7 @@ namespace Gravity
                     handleAuth((string)msg["mine"], (string)msg["number"]);
                     break;
                 case "turn":
-                    handleTurn((string)msg["mine"]);
+                    handleTurn((string)msg["mine"], int.Parse(msg["myHealth"].ToString()), int.Parse(msg["oppHealth"].ToString()));
                     break;
                 case "kill":
                     betweenTurns = true;
@@ -186,12 +193,30 @@ namespace Gravity
             }
         }
 
-        void handleTurn(string val)
+        void handleTurn(string val, int myNewHealth, int oppNewHealth)
         {
+
+            if (myNewHealth == 0)
+            {
+                End.YouWon = false;
+                isGameScreen = false;
+                isEndScreen = true;
+            }
+            else if(oppNewHealth == 0)
+            {
+                End.YouWon = true;
+                isGameScreen = false;
+                isEndScreen = true;
+            }
+
             Debug.WriteLine("Turn changing");
+            myHealth = myNewHealth;
+            oppHealth = oppNewHealth;
             betweenTurns = false;
             colliding = false;
             myTurnPending = val;
+
+
         }
 
         /// <summary>
@@ -224,6 +249,8 @@ namespace Gravity
             ship = Content.Load<Texture2D>("corgiShip");
             menuSprites = Content.Load<Texture2D>("menusprites");
             turnSigns = Content.Load<Texture2D>("turnSigns");
+            winner = Content.Load<Texture2D>("pixi");
+            loser = Content.Load<Texture2D>("pixi");
 
             gameFont = Content.Load<SpriteFont>("SpriteFont1");
 
@@ -284,13 +311,15 @@ namespace Gravity
             {
                 if (!isMenuScreen)
                 {
-                    websocket.Close();
+                    if(websocket != null && websocket.State == WebSocketState.Open)
+                        websocket.Close();
                     isGameScreen = false;
                     isMenuScreen = true;
                 }
                 else
                 {
-                    websocket.Close();
+                    if (websocket != null && websocket.State == WebSocketState.Open)
+                        websocket.Close();
                     Exit();
                 }
             }
@@ -318,6 +347,12 @@ namespace Gravity
                     websocket.Open();
 
                 }
+            }
+            else if (isEndScreen)
+            {
+                TouchCollection touchCollection = TouchPanel.GetState();
+
+                End.Update(touchCollection, gameTime);
             }
 
             if (betweenTurns)

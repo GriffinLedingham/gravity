@@ -118,29 +118,28 @@ namespace Gravity
     public class EndScreen
     {
 
-        Btn start;
-        public bool StartPress = false;
+        public bool YouWon = false;
+        float colourDelta = 0;
 
-        public void Load(ContentManager content)
+        public void Update(TouchCollection tc, GameTime gameTime)
         {
-            start = new Btn(content.Load<Texture2D>("pixi"), new Rectangle(350, 250, 100, 40));
-        }
-
-        public void Update(TouchCollection tc)
-        {
-            foreach (TouchLocation tl in tc)
-            {
-                if (tl.State == TouchLocationState.Pressed && tl.Position.X > start.Rect.X && tl.Position.X < start.Rect.X + start.Rect.Width && tl.Position.Y > start.Rect.Y && tl.Position.Y < start.Rect.Y + start.Rect.Height)
-                {
-                    StartPress = true;
-                }
-            }
+            colourDelta += gameTime.ElapsedGameTime.Milliseconds;
         }
 
         public void render(SpriteBatch sb)
         {
             sb.Begin();
-            sb.Draw(start.tx, start.Rect, Color.White);
+
+            if (YouWon)
+            {
+                sb.Draw(Game1.winner, new Rectangle(-4000 - (int)((colourDelta / 10) % 2000), -3500, 8000, 7000), Color.Green);
+            }
+            else
+            {
+                sb.Draw(Game1.loser, new Rectangle(-4000 - (int)((colourDelta / 10) % 2000), -3500, 8000, 7000), Color.Purple);
+
+            }
+
             sb.End();
         }
 
