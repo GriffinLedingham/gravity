@@ -34,6 +34,8 @@ namespace Gravity
 
         private Texture2D backgroundImage = null;
         private Texture2D planets = null;
+        private Texture2D gameLogo = null;
+        private Texture2D towers = null;
 
         const float unitToPixel = 100.0f;
         const float pixelToUnit = 1 / unitToPixel;
@@ -205,6 +207,8 @@ namespace Gravity
             Pixi = Content.Load<Texture2D>("pixi");
             backgroundImage = Content.Load<Texture2D>("background");
             planets = Content.Load<Texture2D>("planets");
+            gameLogo = Content.Load<Texture2D>("logo");
+            towers = Content.Load<Texture2D>("towers");
 
             world = new World(new Vector2(0, 0)); // Grav 0 cause we in space hommie
 
@@ -568,7 +572,8 @@ namespace Gravity
             {
                 //spriteBatch.Draw(Game1.Pixi, d.Position, null, Color.Red, d.Planet.Rotation, new Vector2(Game1.Pixi.Width / 2.0f, Game1.Pixi.Height / 2.0f), d.Size, SpriteEffects.None, 0);
                 spriteBatch.Draw(planets, d.Position - new Vector2(50), new Rectangle(100 * d.index, 0, 100, 100), Color.White);
-                spriteBatch.Draw(Game1.Pixi, d.CityPosition, null, Color.Green, d.City.Rotation, new Vector2(Game1.Pixi.Width / 2.0f, Game1.Pixi.Height / 2.0f), d.CitySize, SpriteEffects.None, 0);
+                //spriteBatch.Draw(Game1.Pixi, d.CityPosition, null, Color.Green, d.City.Rotation, new Vector2(Game1.Pixi.Width / 2.0f, Game1.Pixi.Height / 2.0f), d.CitySize, SpriteEffects.None, 0);
+                spriteBatch.Draw(towers, d.CityPosition + (d.left ? Vector2.Zero : new Vector2(23, 0)), new Rectangle(0, (d.left) ? 44 : 0, 100, 44), Color.White, 0.0f, new Vector2(towers.Width / 2.0f + 10, towers.Height / 4.0f), 1.0f, d.left ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0.0f);
             }
             if (CurrentProjectile != null)
                 spriteBatch.Draw(Game1.Pixi, CurrentProjectile.Position, null, Color.Yellow, CurrentProjectile.Proj.Rotation, new Vector2(Game1.Pixi.Width / 2.0f, Game1.Pixi.Height / 2.0f), CurrentProjectile.Size, SpriteEffects.None, 0);

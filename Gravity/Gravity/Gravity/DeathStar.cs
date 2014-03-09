@@ -24,6 +24,8 @@ namespace Gravity
         public Body City;
         public Vector2 _citySize;
 
+        public bool left;
+
         public Vector2 CitySize
         {
             get
@@ -72,6 +74,7 @@ namespace Gravity
             this.world = world;
 
             this.Pull = pull;
+            this.left = left;
 
             index = Game1.Game1Random.Next() % 3;
 
