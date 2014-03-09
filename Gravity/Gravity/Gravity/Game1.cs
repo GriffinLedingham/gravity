@@ -170,6 +170,8 @@ namespace Gravity
         void handleFire(float posx, float posy, float ang, float velx, float vely, float intertia, float rot)
         {
 
+            if (myTurn || myTurnPending == "true") return;
+
             CurrentProjectile.Position = new Vector2(posx, posy);
             CurrentProjectile.Proj.AngularVelocity = ang;
             CurrentProjectile.Proj.LinearVelocity = new Vector2(velx, vely);
