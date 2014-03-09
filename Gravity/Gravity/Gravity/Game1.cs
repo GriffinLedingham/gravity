@@ -276,11 +276,13 @@ namespace Gravity
             {
                 if (!isMenuScreen)
                 {
+                    websocket.Close();
                     isGameScreen = false;
                     isMenuScreen = true;
                 }
                 else
                 {
+                    websocket.Close();
                     Exit();
                 }
             }
@@ -330,6 +332,7 @@ namespace Gravity
 
                 freeMove = false;
 
+
                 if (playerNum == "one")
                 {
 
@@ -343,6 +346,7 @@ namespace Gravity
                 }
                 else if (playerNum == "two")
                 {
+
                     if (CurrentProjectile != null && CurrentProjectile.Proj != null)
                     {
                         CurrentProjectile.Proj.OnCollision -= proj_OnCollision;
@@ -376,6 +380,8 @@ namespace Gravity
 
                 if (playerNum == "one")
                 {
+
+
                     if (CurrentProjectile != null && CurrentProjectile.Proj != null)
                     {
                         CurrentProjectile.Proj.OnCollision -= proj_OnCollision;
@@ -385,6 +391,8 @@ namespace Gravity
                 }
                 else if (playerNum == "two")
                 {
+
+
                     if (CurrentProjectile != null && CurrentProjectile.Proj != null)
                     {
                         CurrentProjectile.Proj.OnCollision -= proj_OnCollision;
@@ -582,29 +590,35 @@ namespace Gravity
             {
                 Debug.WriteLine("GG PLANET, YOU HIT");
                 betweenTurns = true;
-
-                JsonObject msg = new JsonObject();
-                msg["type"] = "turn";
-                if (playerHit == 1)
-                    msg["hit"] = "one";
-                else if (playerHit == 2)
-                    msg["hit"] = "two";
-                else if (playerHitCity == 1)
-                    msg["cityHit"] = "one";
-                else if(playerHitCity == 2)
-                    msg["cityHit"] = "two";
-                else
+                try
                 {
-                    msg["hit"] = "zero";
-                    msg["cityHit"] = "zero";
+                    JsonObject msg = new JsonObject();
+                    msg["type"] = "turn";
+                    if (playerHit == 1)
+                        msg["hit"] = "one";
+                    else if (playerHit == 2)
+                        msg["hit"] = "two";
+                    else if (playerHitCity == 1)
+                        msg["cityHit"] = "one";
+                    else if (playerHitCity == 2)
+                        msg["cityHit"] = "two";
+                    else
+                    {
+                        msg["hit"] = "zero";
+                        msg["cityHit"] = "zero";
+                    }
+
+                    playerHit = 0;
+                    playerHitCity = 0;
+
+                    if (myTurn)
+                    {
+                        websocket.Send(SimpleJson.SimpleJson.SerializeObject(msg));
+                    }
                 }
-                    
-                playerHit = 0;
-                playerHitCity = 0;
-
-                if (myTurn)
+                catch (Exception e)
                 {
-                    websocket.Send(SimpleJson.SimpleJson.SerializeObject(msg));
+
                 }
             }
 
@@ -688,7 +702,7 @@ namespace Gravity
 
                 if (CurrentProjectile != null)
                 {
-                    spriteBatch.Draw(Game1.Pixi, CurrentProjectile.Position, null, Color.Yellow, CurrentProjectile.Proj.Rotation, new Vector2(Game1.Pixi.Width / 2.0f, Game1.Pixi.Height / 2.0f), CurrentProjectile.Size, SpriteEffects.None, 0);
+                    //spriteBatch.Draw(Game1.Pixi, CurrentProjectile.Position, null, Color.Yellow, CurrentProjectile.Proj.Rotation, new Vector2(Game1.Pixi.Width / 2.0f, Game1.Pixi.Height / 2.0f), CurrentProjectile.Size, SpriteEffects.None, 0);
                     spriteBatch.Draw(Game1.ship, CurrentProjectile.Position, null, Color.White, (float)Math.PI + (float)Math.Atan2(CurrentProjectile.Proj.LinearVelocity.Y, CurrentProjectile.Proj.LinearVelocity.X), new Vector2(Game1.ship.Width / 2.0f, Game1.ship.Height / 2.0f), 0.2f, SpriteEffects.None, 0.0f);
                 }
 
