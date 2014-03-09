@@ -137,6 +137,9 @@ namespace Gravity
                 case "turn":
                     handleTurn((string)msg["mine"]);
                     break;
+                case "kill":
+                    betweenTurns = true;
+                    break;
             }
         }
 
