@@ -161,10 +161,11 @@ namespace Gravity
                 case "kill":
                     betweenTurns = true;
                     break;
+                case "reset":
+                    reset();
+                    break;
             }
         }
-
-
 
         void handleFire(float posx, float posy, float ang, float velx, float vely, float intertia, float rot)
         {
@@ -286,18 +287,24 @@ namespace Gravity
             objectDrag = false;
 
             Projectiles.Clear();
-
-            camY = 0;
-
-            camX = 0;
+            myTurn = false;
 
             zoom = 1.0f;
             lastScale = 1.0f;
 
             LastVelocity = Vector2.Zero;
-
+            CurrentProjectile = null
+            myTurnPending = null;
+            myTurn = true;
 
             freeMove = false;
+
+            camY = 0;
+
+            camX = 0;
+            isGameScreen = false;
+            isEndScreen = false;
+            isMenuScreen = true;
 
         }
 
@@ -325,6 +332,7 @@ namespace Gravity
                         websocket.Close();
                     Exit();
                 }
+                reset();
             }
 
             if (isMenuScreen)
