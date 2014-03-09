@@ -98,9 +98,7 @@ namespace Gravity
         {
 
             JsonObject msg = SimpleJson.SimpleJson.DeserializeObject<JsonObject>(e.Message);
-            Debug.WriteLine("MessageRecieved: " + msg);
             string type = (string)msg["type"];
-            Debug.WriteLine(msg);
             switch (type)
             {
                 case "fire":
@@ -112,14 +110,13 @@ namespace Gravity
                         float.Parse(msg["pos_y"].ToString()));
                     break;
             }
-
         }
 
 
 
         void handleFire(float angle, float forcex, float forcey, float posx, float posy)
         {
-            CurrentProjectile = new Projectile(new Vector2(20), new Vector2(posx, posy), world, false);
+            CurrentProjectile.Position = new Vector2(posx, posy);
             CurrentProjectile.THISVARIABLEFUCKINGSUCKS = true;
             CurrentProjectile.Force = new Vector2(forcex, forcey);
         }
@@ -310,23 +307,7 @@ namespace Gravity
                 }
             }
 
-            if (!CurrentProjectile.Mine && CurrentProjectile.THISVARIABLEFUCKINGSUCKS)
-            {
-                objectMoving = false;
-                objectDrag = false;
 
-                projForce = CurrentProjectile.Force;
-                float len = projForce.Length() * 15;
-                projForce.Normalize();
-
-                projForce = projForce * len * pixelToUnit;
-
-                camX = CurrentProjectile.Position.X;
-                camY = CurrentProjectile.Position.Y;
-
-                CurrentProjectile.THISVARIABLEFUCKINGSUCKS = false;
-
-            }
 
             if (objectMoving)
             {

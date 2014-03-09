@@ -23,6 +23,8 @@ namespace Gravity
 
         public Vector2 Force { get; set; }
 
+        public Vector2 OldPos { get; set; }
+
         public Vector2 Position
         {
             get
