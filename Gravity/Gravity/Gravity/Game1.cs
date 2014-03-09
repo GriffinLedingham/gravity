@@ -42,6 +42,10 @@ namespace Gravity
         public static Texture2D winner = null;
         public static Texture2D loser = null;
         public static Texture2D hearts = null;
+        public static Texture2D youWin = null;
+        public static Texture2D youLose = null;
+        public static Texture2D spaceCorgi = null;
+
 
         public static SpriteFont gameFont = null;
 
@@ -255,6 +259,9 @@ namespace Gravity
             winner = Content.Load<Texture2D>("pixi");
             loser = Content.Load<Texture2D>("pixi");
             hearts = Content.Load<Texture2D>("hearts");
+            youWin = Content.Load<Texture2D>("youWin");
+            youLose = Content.Load<Texture2D>("youLose");
+            spaceCorgi = Content.Load<Texture2D>("corgi_space");
 
             gameFont = Content.Load<SpriteFont>("SpriteFont1");
 
