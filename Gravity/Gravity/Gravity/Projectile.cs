@@ -61,6 +61,8 @@ namespace Gravity
             Proj.BodyType = BodyType.Dynamic;
             Proj.Position = pos * pixelToUnit;
 
+            Mine = mine;
+
         }
 
     }
