@@ -76,6 +76,9 @@ namespace Gravity
 
         private int playerHit = 0;
 
+        public int DS1Pos = 200;
+        public int DS2Pos = 1400;
+
         public Game1()
         {
 
@@ -165,11 +168,11 @@ namespace Gravity
 
             if (playerNum == "one")
             {
-                DeathStars[0] = new DeathStar(new Vector2(100, 100), new Vector2(200, 100), new Vector2(1), world, true);
+                DeathStars[0] = new DeathStar(new Vector2(100, 100), new Vector2(DS1Pos, 100), new Vector2(1), world, true);
             }
             else
             {
-                DeathStars[1] = new DeathStar(new Vector2(100, 100), new Vector2(1400, 100), new Vector2(1), world, false);
+                DeathStars[1] = new DeathStar(new Vector2(100, 100), new Vector2(DS2Pos, 100), new Vector2(1), world, false);
             }
         }
 
@@ -208,8 +211,8 @@ namespace Gravity
 
             world = new World(new Vector2(0, 0)); // Grav 0 cause we in space hommie
 
-            DeathStars[0] = new DeathStar(new Vector2(100, 100), new Vector2(200, 100), new Vector2(3), world, true);
-            DeathStars[1] = new DeathStar(new Vector2(100, 100), new Vector2(1400, 100), new Vector2(3), world, false);
+            DeathStars[0] = new DeathStar(new Vector2(100, 100), new Vector2(DS1Pos, 100), new Vector2(3), world, true);
+            DeathStars[1] = new DeathStar(new Vector2(100, 100), new Vector2(DS2Pos, 100), new Vector2(3), world, false);
 
             //CurrentProjectile = new Projectile(new Vector2(20, 20), new Vector2(400, 250), world, true);
 
@@ -255,7 +258,7 @@ namespace Gravity
 
 
                 freeMove = false;
-                CurrentProjectile = new Projectile(new Vector2(20, 20), new Vector2(400, 250), world, true);
+                CurrentProjectile = new Projectile(new Vector2(20, 20), new Vector2(DS1Pos + 200, 250), world, true);
 
             }
             if (myTurnPending == "true")
@@ -277,11 +280,11 @@ namespace Gravity
 
                 if (playerNum == "one")
                 {
-                    CurrentProjectile = new Projectile(new Vector2(20, 20), new Vector2(300, 250), world, true);
+                    CurrentProjectile = new Projectile(new Vector2(20, 20), new Vector2(DS1Pos + 100, 250), world, true);
                 }
                 else if (playerNum == "two")
                 {
-                    CurrentProjectile = new Projectile(new Vector2(20, 20), new Vector2(1200, 250), world, true);
+                    CurrentProjectile = new Projectile(new Vector2(20, 20), new Vector2(DS2Pos - 100, 250), world, true);
                 }
 
                 //THIS FOCUSES ON THE CAMERA WHEN YOU DO A PINCH ZOOM BACK IN, SO WE AREN'T LOST
@@ -309,11 +312,11 @@ namespace Gravity
 
                 if (playerNum == "one")
                 {
-                    CurrentProjectile = new Projectile(new Vector2(20, 20), new Vector2(1200, 250), world, true);
+                    CurrentProjectile = new Projectile(new Vector2(20, 20), new Vector2(DS2Pos - 100, 250), world, true);
                 }
                 else if (playerNum == "two")
                 {
-                    CurrentProjectile = new Projectile(new Vector2(20, 20), new Vector2(300, 250), world, true);
+                    CurrentProjectile = new Projectile(new Vector2(20, 20), new Vector2(DS1Pos + 100, 250), world, true);
 
                 }
 
