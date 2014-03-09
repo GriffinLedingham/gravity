@@ -75,6 +75,7 @@ namespace Gravity
         private bool colliding = false;
 
         private int playerHit = 0;
+        private int playerHitCity = 0;
 
         public Game1()
         {
@@ -509,9 +510,18 @@ namespace Gravity
                     msg["hit"] = "one";
                 else if (playerHit == 2)
                     msg["hit"] = "two";
+                else if (playerHitCity == 1)
+                    msg["cityHit"] = "one";
+                else if(playerHitCity == 2)
+                    msg["cityHit"] = "two";
                 else
+                {
                     msg["hit"] = "zero";
+                    msg["cityHit"] = "zero";
+                }
+                    
                 playerHit = 0;
+                playerHitCity = 0;
 
                 if (myTurn)
                 {
@@ -537,7 +547,7 @@ namespace Gravity
 
         private bool proj_OnCollision(Fixture f1, Fixture f2, Contact contact)
         {
-            if ((f1.Body == CurrentProjectile.Proj && f2.Body == DeathStars[0].Planet && colliding == false))
+            /*if ((f1.Body == CurrentProjectile.Proj && f2.Body == DeathStars[0].Planet && colliding == false))
             {
                 colliding = true;
                 playerHit = 1;
@@ -546,7 +556,32 @@ namespace Gravity
             {
                 colliding = true;
                 playerHit = 2;
+            }*/
+
+            if ((f1.Body == CurrentProjectile.Proj) && colliding == false)
+            {
+                if (f2.Body == DeathStars[0].Planet)
+                {
+                    colliding = true;
+                    playerHit = 1;
+                }
+                else if(f2.Body == DeathStars[1].Planet)
+                {
+                    colliding = true;
+                    playerHit = 2;
+                }
+                else if (f2.Body == DeathStars[0].City)
+                {
+                    colliding = true;
+                    playerHitCity = 1;
+                }
+                else if (f2.Body == DeathStars[1].City)
+                {
+                    colliding = true;
+                    playerHitCity = 2;
+                }
             }
+
             return true;
         }
 
