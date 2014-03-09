@@ -320,15 +320,22 @@ namespace Gravity
                 if (!float.IsNaN(projForce.X))
                     CurrentProjectile.Proj.ApplyForce(projForce);
 
-                JsonObject msg = new JsonObject();
-                msg["type"] = "fire";
-                msg["vel_x"] = CurrentProjectile.Proj.LinearVelocity.X;
-                msg["vel_y"] = CurrentProjectile.Proj.LinearVelocity.Y;
-                msg["pos_x"] = CurrentProjectile.Position.X;
-                msg["pos_y"] = CurrentProjectile.Position.Y;
+                if (i == 0)
+                {
+                    JsonObject msg = new JsonObject();
+                    msg["type"] = "fire";
+                    msg["vel_x"] = CurrentProjectile.Proj.LinearVelocity.X;
+                    msg["vel_y"] = CurrentProjectile.Proj.LinearVelocity.Y;
+                    msg["pos_x"] = CurrentProjectile.Position.X;
+                    msg["pos_y"] = CurrentProjectile.Position.Y;
 
-                websocket.Send(SimpleJson.SimpleJson.SerializeObject(msg));
-
+                    websocket.Send(SimpleJson.SimpleJson.SerializeObject(msg));
+                    i++;
+                }
+                else
+                {
+                    i = (i + 1) % 2;
+                }
             }
 
             world.Step((float)gameTime.ElapsedGameTime.TotalSeconds);
@@ -344,6 +351,8 @@ namespace Gravity
 
             base.Update(gameTime);
         }
+
+        int i = 0;
 
         /// <summary>
         /// This is called when the game should draw itself.
