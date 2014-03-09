@@ -153,6 +153,8 @@ namespace Gravity
             DeathStars[0] = new DeathStar(new Vector2(100, 100), new Vector2(100, 100), new Vector2(3), world);
             DeathStars[1] = new DeathStar(new Vector2(100, 100), new Vector2(1300, 100), new Vector2(3), world);
 
+            CurrentProjectile = new Projectile(new Vector2(20, 20), new Vector2(400, 100), world, false);
+
             windowWidth = Window.ClientBounds.Width;
             windowHeight = Window.ClientBounds.Height;
 
@@ -312,7 +314,7 @@ namespace Gravity
                 }
             }
 
-            if (!CurrentProjectile.Mine && CurrentProjectile.THISVARIABLEFUCKINGSUCKS)
+            if (CurrentProjectile != null && !CurrentProjectile.Mine && CurrentProjectile.THISVARIABLEFUCKINGSUCKS)
             {
                 objectMoving = true;
                 objectDrag = false;
