@@ -778,8 +778,8 @@ namespace Gravity
 
                 for (int i = 0; i < maxHealth; i++)
                 {
-                    spriteBatch.Draw(hearts, new Rectangle(10 + (32 * i), 10, 32, 32), new Rectangle((i <= myHealth ? 0 : 128), 0, 128, 128), Color.White);
-                    spriteBatch.Draw(hearts, new Rectangle((spriteBatch.GraphicsDevice.DisplayMode.Width / 2) + (turnSigns.Width) + 10 + (32 * i), 10, 32, 32), new Rectangle((i <= oppHealth ? 0 : 128), 0, 128, 128), Color.White);
+                    spriteBatch.Draw(hearts, new Rectangle(10 + (32 * i), 10, 32, 32), new Rectangle((i < myHealth ? 0 : 128), 0, 128, 128), Color.White);
+                    spriteBatch.Draw(hearts, new Rectangle((spriteBatch.GraphicsDevice.DisplayMode.Width / 2) + (turnSigns.Width) + 10 + (32 * i), 10, 32, 32), new Rectangle((i < oppHealth ? 0 : 128), 0, 128, 128), Color.White);
                 }
 
                 spriteBatch.End();
