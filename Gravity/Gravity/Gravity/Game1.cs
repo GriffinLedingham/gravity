@@ -111,6 +111,7 @@ namespace Gravity
             
 
             Menu = new MainMenu();
+            End = new EndScreen();
 
         }
 
