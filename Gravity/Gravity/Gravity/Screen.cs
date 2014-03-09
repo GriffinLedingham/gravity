@@ -114,4 +114,40 @@ namespace Gravity
 
     }
 
+
+    public class EndScreen
+    {
+
+        Btn start;
+        public bool StartPress = false;
+
+        public void Load(ContentManager content)
+        {
+            start = new Btn(content.Load<Texture2D>("pixi"), new Rectangle(350, 250, 100, 40));
+        }
+
+        public void Update(TouchCollection tc)
+        {
+            foreach (TouchLocation tl in tc)
+            {
+                if (tl.State == TouchLocationState.Pressed && tl.Position.X > start.Rect.X && tl.Position.X < start.Rect.X + start.Rect.Width && tl.Position.Y > start.Rect.Y && tl.Position.Y < start.Rect.Y + start.Rect.Height)
+                {
+                    StartPress = true;
+                }
+            }
+        }
+
+        public void render(SpriteBatch sb)
+        {
+            sb.Begin();
+            sb.Draw(start.tx, start.Rect, Color.White);
+            sb.End();
+        }
+
+    }
+
+
+
+
+
 }

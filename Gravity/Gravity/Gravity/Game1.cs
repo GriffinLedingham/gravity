@@ -282,11 +282,13 @@ namespace Gravity
             {
                 if (!isMenuScreen)
                 {
+                    websocket.Close();
                     isGameScreen = false;
                     isMenuScreen = true;
                 }
                 else
                 {
+                    websocket.Close();
                     Exit();
                 }
             }
@@ -336,13 +338,27 @@ namespace Gravity
 
                 freeMove = false;
 
+
                 if (playerNum == "one")
                 {
+
+                    if (CurrentProjectile != null && CurrentProjectile.Proj != null)
+                    {
+                        CurrentProjectile.Proj.OnCollision -= proj_OnCollision;
+                    }
+
                     CurrentProjectile = new Projectile(new Vector2(20, 20), new Vector2(DS1Pos + 100, 250), world, true);
+                    CurrentProjectile.Proj.OnCollision += proj_OnCollision;
                 }
                 else if (playerNum == "two")
                 {
+
+                    if (CurrentProjectile != null && CurrentProjectile.Proj != null)
+                    {
+                        CurrentProjectile.Proj.OnCollision -= proj_OnCollision;
+                    }
                     CurrentProjectile = new Projectile(new Vector2(20, 20), new Vector2(DS2Pos - 100, 250), world, true);
+                    CurrentProjectile.Proj.OnCollision += proj_OnCollision;
                 }
 
                 //THIS FOCUSES ON THE CAMERA WHEN YOU DO A PINCH ZOOM BACK IN, SO WE AREN'T LOST
@@ -370,11 +386,25 @@ namespace Gravity
 
                 if (playerNum == "one")
                 {
-                    CurrentProjectile = new Projectile(new Vector2(20, 20), new Vector2(DS2Pos - 100, 250), world, true);
+
+
+                    if (CurrentProjectile != null && CurrentProjectile.Proj != null)
+                    {
+                        CurrentProjectile.Proj.OnCollision -= proj_OnCollision;
+                    }
+                    CurrentProjectile = new Projectile(new Vector2(20, 20), new Vector2(DS2Pos - 100, 250), world, false);
+                    CurrentProjectile.Proj.OnCollision += proj_OnCollision;
                 }
                 else if (playerNum == "two")
                 {
-                    CurrentProjectile = new Projectile(new Vector2(20, 20), new Vector2(DS1Pos + 100, 250), world, true);
+
+
+                    if (CurrentProjectile != null && CurrentProjectile.Proj != null)
+                    {
+                        CurrentProjectile.Proj.OnCollision -= proj_OnCollision;
+                    }
+                    CurrentProjectile = new Projectile(new Vector2(20, 20), new Vector2(DS1Pos + 100, 250), world, false);
+                    CurrentProjectile.Proj.OnCollision += proj_OnCollision;
 
                 }
 
@@ -508,8 +538,8 @@ namespace Gravity
 
                 projForce = projForce * len * pixelToUnit;
 
-                camX = CurrentProjectile.Position.X;
-                camY = CurrentProjectile.Position.Y;
+                camY = (int)(-CurrentProjectile.Position.Y + windowHeight / 2.0f);
+                camX = (int)(-CurrentProjectile.Position.X + windowWidth / 2.0f);
 
                 CurrentProjectile.THISVARIABLEFUCKINGSUCKS = false;
             }
@@ -535,18 +565,24 @@ namespace Gravity
 
                 if (CurrentProjectile.Mine)
                 {
-                    JsonObject msg = new JsonObject();
-                    msg["type"] = "fire";
-                    msg["pos_x"] = CurrentProjectile.Position.X;
-                    msg["pos_y"] = CurrentProjectile.Position.Y;
-                    msg["ang"] = CurrentProjectile.Proj.AngularVelocity;
-                    msg["vel_x"] = CurrentProjectile.Proj.LinearVelocity.X;
-                    msg["vel_y"] = CurrentProjectile.Proj.LinearVelocity.Y;
-                    msg["inertia"] = CurrentProjectile.Proj.Inertia;
-                    msg["rot"] = CurrentProjectile.Proj.Rotation;
+                    try
+                    {
+                        JsonObject msg = new JsonObject();
+                        msg["type"] = "fire";
+                        msg["pos_x"] = CurrentProjectile.Position.X;
+                        msg["pos_y"] = CurrentProjectile.Position.Y;
+                        msg["ang"] = CurrentProjectile.Proj.AngularVelocity;
+                        msg["vel_x"] = CurrentProjectile.Proj.LinearVelocity.X;
+                        msg["vel_y"] = CurrentProjectile.Proj.LinearVelocity.Y;
+                        msg["inertia"] = CurrentProjectile.Proj.Inertia;
+                        msg["rot"] = CurrentProjectile.Proj.Rotation;
 
-                    websocket.Send(SimpleJson.SimpleJson.SerializeObject(msg));
+                        websocket.Send(SimpleJson.SimpleJson.SerializeObject(msg));
+                    }
+                    catch (Exception e)
+                    {
 
+                    }
 
                     CurrentProjectile.Proj.ApplyForce(projForce);
                 }
@@ -556,35 +592,39 @@ namespace Gravity
                 }
             }
 
-            if (colliding == false && CurrentProjectile != null)
-                CurrentProjectile.Proj.OnCollision += proj_OnCollision;
-            else
+            if (!(colliding == false && CurrentProjectile != null))
             {
                 Debug.WriteLine("GG PLANET, YOU HIT");
                 betweenTurns = true;
-
-                JsonObject msg = new JsonObject();
-                msg["type"] = "turn";
-                if (playerHit == 1)
-                    msg["hit"] = "one";
-                else if (playerHit == 2)
-                    msg["hit"] = "two";
-                else if (playerHitCity == 1)
-                    msg["cityHit"] = "one";
-                else if(playerHitCity == 2)
-                    msg["cityHit"] = "two";
-                else
+                try
                 {
-                    msg["hit"] = "zero";
-                    msg["cityHit"] = "zero";
+                    JsonObject msg = new JsonObject();
+                    msg["type"] = "turn";
+                    if (playerHit == 1)
+                        msg["hit"] = "one";
+                    else if (playerHit == 2)
+                        msg["hit"] = "two";
+                    else if (playerHitCity == 1)
+                        msg["cityHit"] = "one";
+                    else if (playerHitCity == 2)
+                        msg["cityHit"] = "two";
+                    else
+                    {
+                        msg["hit"] = "zero";
+                        msg["cityHit"] = "zero";
+                    }
+
+                    playerHit = 0;
+                    playerHitCity = 0;
+
+                    if (myTurn)
+                    {
+                        websocket.Send(SimpleJson.SimpleJson.SerializeObject(msg));
+                    }
                 }
-                    
-                playerHit = 0;
-                playerHitCity = 0;
-
-                if (myTurn)
+                catch (Exception e)
                 {
-                    websocket.Send(SimpleJson.SimpleJson.SerializeObject(msg));
+
                 }
             }
 
@@ -616,7 +656,10 @@ namespace Gravity
                 colliding = true;
                 playerHit = 2;
             }*/
-
+            if (betweenTurns || colliding || !(myTurn)  || myTurnPending != null)
+            {
+                return false;
+            }
             if ((f1.Body == CurrentProjectile.Proj) && colliding == false)
             {
                 if (f2.Body == DeathStars[0].Planet)
@@ -665,7 +708,7 @@ namespace Gravity
 
                 if (CurrentProjectile != null)
                 {
-                    spriteBatch.Draw(Game1.Pixi, CurrentProjectile.Position, null, Color.Yellow, CurrentProjectile.Proj.Rotation, new Vector2(Game1.Pixi.Width / 2.0f, Game1.Pixi.Height / 2.0f), CurrentProjectile.Size, SpriteEffects.None, 0);
+                    //spriteBatch.Draw(Game1.Pixi, CurrentProjectile.Position, null, Color.Yellow, CurrentProjectile.Proj.Rotation, new Vector2(Game1.Pixi.Width / 2.0f, Game1.Pixi.Height / 2.0f), CurrentProjectile.Size, SpriteEffects.None, 0);
                     spriteBatch.Draw(Game1.ship, CurrentProjectile.Position, null, Color.White, (float)Math.PI + (float)Math.Atan2(CurrentProjectile.Proj.LinearVelocity.Y, CurrentProjectile.Proj.LinearVelocity.X), new Vector2(Game1.ship.Width / 2.0f, Game1.ship.Height / 2.0f), 0.2f, SpriteEffects.None, 0.0f);
                 }
 
@@ -676,9 +719,7 @@ namespace Gravity
                     //spriteBatch.Draw(Game1.Pixi, d.CityPosition, null, Color.Green, d.City.Rotation, new Vector2(Game1.Pixi.Width / 2.0f, Game1.Pixi.Height / 2.0f), d.CitySize, SpriteEffects.None, 0);
                     spriteBatch.Draw(towers, d.CityPosition + (d.left ? Vector2.Zero : new Vector2(23, 0)), new Rectangle(0, (d.left) ? 44 : 0, 100, 44), Color.White, 0.0f, new Vector2(towers.Width / 2.0f + 10, towers.Height / 4.0f), 1.0f, d.left ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0.0f);
                 }
-                if (CurrentProjectile != null)
-                    spriteBatch.Draw(Game1.Pixi, CurrentProjectile.Position, null, Color.Yellow, CurrentProjectile.Proj.Rotation, new Vector2(Game1.Pixi.Width / 2.0f, Game1.Pixi.Height / 2.0f), CurrentProjectile.Size, SpriteEffects.None, 0);
-
+                
                 spriteBatch.End();
             }
         
