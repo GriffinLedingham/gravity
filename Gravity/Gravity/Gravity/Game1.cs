@@ -649,10 +649,16 @@ namespace Gravity
 
             if (!(colliding == false && CurrentProjectile != null))
             {
+                colliding = false;
+                
                 Debug.WriteLine("GG PLANET, YOU HIT");
                 betweenTurns = true;
                 try
                 {
+                    if (CurrentProjectile != null && CurrentProjectile.Proj != null)
+                    {
+                        CurrentProjectile.Proj.OnCollision -= proj_OnCollision;
+                    }
                     JsonObject msg = new JsonObject();
                     msg["type"] = "turn";
                     if (playerHit == 1)
@@ -676,11 +682,13 @@ namespace Gravity
                     {
                         websocket.Send(SimpleJson.SimpleJson.SerializeObject(msg));
                     }
+                    CurrentProjectile.Proj.OnCollision += proj_OnCollision;
                 }
                 catch (Exception e)
                 {
 
                 }
+
             }
 
             world.Step((float)0.03f);
