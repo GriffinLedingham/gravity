@@ -1,0 +1,16 @@
+<html>
+<script>
+var socket = new WebSocket("ws://localhost:8142");
+socket.onmessage = function(msg){
+  console.log(JSON.parse(msg.data));
+}
+
+socket.onopen = function(){
+  socket.send(JSON.stringify(
+    {type:'fire',force_x:10,force_y:10,angle:10,pos_x:10,pos_y:10}));
+}
+
+</script>
+
+
+</html>
