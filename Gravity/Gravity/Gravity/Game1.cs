@@ -296,13 +296,14 @@ namespace Gravity
 
                 }
 
+                //THIS FOCUSES ON THE CAMERA WHEN YOU DO A PINCH ZOOM BACK IN, SO WE AREN'T LOST
                 camY = (int)(-CurrentProjectile.Position.Y + windowHeight / 2.0f);
                 camX = (int)(-CurrentProjectile.Position.X + windowWidth / 2.0f);
             }
 
             Vector2 projForce = Vector2.Zero;
 
-            if (TouchPanel.IsGestureAvailable) //&& myTurn == false)
+            if (TouchPanel.IsGestureAvailable) //&& myTurn == false) THIS IS SO YOU CAN ONLY PINCH ZOOM OUT ON OPPONENT'S TURN
             {
                 GestureSample gs = TouchPanel.ReadGesture();
                 switch (gs.GestureType)
@@ -327,7 +328,7 @@ namespace Gravity
                         break;
                 }
             }
-            else if (!objectMoving) //&& myTurn == true)
+            else if (!objectMoving) //&& myTurn == true) THIS MAKES IT SO YOU CAN'T SHOOT THE PROJ ON YOUR OPPONENTS TURN
             {
                 TouchCollection touchCollection = TouchPanel.GetState();
                 foreach (TouchLocation tl in touchCollection)
