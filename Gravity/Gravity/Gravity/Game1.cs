@@ -16,6 +16,7 @@ using FarseerPhysics.Factories;
 using System.Diagnostics;
 using WebSocket4Net;
 using SimpleJson;
+using FarseerPhysics.Dynamics.Contacts;
 
 namespace Gravity
 {
@@ -61,6 +62,17 @@ namespace Gravity
 
         private Vector2 LastVelocity;
 
+        private string myTurnPending = "false";
+        private bool myTurn = false;
+
+        private bool betweenTurns = true;
+
+        private string playerNum = "";
+
+        private bool colliding = false;
+
+        private int playerHit = 0;
+
         public Game1()
         {
 
@@ -72,7 +84,7 @@ namespace Gravity
 
             // Extend battery life under lock.
             InactiveSleepTime = TimeSpan.FromSeconds(1);
-            websocket = new WebSocket("ws://192.168.1.168:8142/");
+            websocket = new WebSocket("ws://192.168.1.108:8142/");
             websocket.EnableAutoSendPing = true;
             websocket.Opened += websocket_Opened;
             websocket.Closed += websocket_Closed;
@@ -111,6 +123,12 @@ namespace Gravity
                         float.Parse(msg["pos_x"].ToString()),
                         float.Parse(msg["pos_y"].ToString()));
                     break;
+                case "auth":
+                    handleAuth((string)msg["mine"], (string)msg["number"]);
+                    break;
+                case "turn":
+                    handleTurn((string)msg["mine"]);
+                    break;
             }
         }
 
@@ -119,10 +137,24 @@ namespace Gravity
         void handleFire(float velx, float vely, float posx, float posy)
         {
 
-            LastVelocity = new Vector2(posx, posy);
-
+            LastVelocity = new Vector2(velx, vely);
+            CurrentProjectile.Position = new Vector2(posx, posy);
             CurrentProjectile.Mine = false;
             objectMoving = true;
+        }
+
+        void handleAuth(string val, string num)
+        {
+            betweenTurns = false;
+            myTurnPending = val;
+            playerNum = num;
+        }
+
+        void handleTurn(string val)
+        {
+            Debug.WriteLine("Turn changing");
+            betweenTurns = false;
+            myTurnPending = val;
         }
 
         /// <summary>
@@ -154,7 +186,7 @@ namespace Gravity
             DeathStars[0] = new DeathStar(new Vector2(100, 100), new Vector2(100, 100), new Vector2(3), world);
             DeathStars[1] = new DeathStar(new Vector2(100, 100), new Vector2(1300, 100), new Vector2(3), world);
 
-            CurrentProjectile = new Projectile(new Vector2(20, 20), new Vector2(400, 250), world, true);
+            //CurrentProjectile = new Projectile(new Vector2(20, 20), new Vector2(400, 250), world, true);
 
             windowWidth = Window.ClientBounds.Width;
             windowHeight = Window.ClientBounds.Height;
@@ -177,6 +209,8 @@ namespace Gravity
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
+            if (betweenTurns)
+                return;
             // Allows the game to exit
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
             {
@@ -199,10 +233,71 @@ namespace Gravity
                 CurrentProjectile = new Projectile(new Vector2(20, 20), new Vector2(400, 250), world, true);
 
             }
+            if (myTurnPending == "true")
+            {
+                objectMoving = false;
+                objectDrag = false;
+
+                Projectiles.Clear();
+
+                camY = 0;
+
+                camX = 0;
+
+                zoom = 1.0f;
+                lastScale = 1.0f;
+
+                LastVelocity = Vector2.Zero;
+
+                myTurnPending = null;
+                myTurn = true;
+
+                freeMove = false;
+
+                if (playerNum == "one")
+                {
+                    CurrentProjectile = new Projectile(new Vector2(20, 20), new Vector2(200, 250), world, true);
+                }
+                else if (playerNum == "two")
+                {
+                    CurrentProjectile = new Projectile(new Vector2(20, 20), new Vector2(1100, 250), world, true);
+                }
+            }
+            else if (myTurnPending == "false")
+            {
+                objectMoving = false;
+                objectDrag = false;
+
+                Projectiles.Clear();
+
+                camY = 0;
+
+                camX = 0;
+
+                zoom = 1.0f;
+                lastScale = 1.0f;
+
+                LastVelocity = Vector2.Zero;
+
+                myTurnPending = null;
+                myTurn = false;
+
+                freeMove = false;
+
+                if (playerNum == "one")
+                {
+                    CurrentProjectile = new Projectile(new Vector2(20, 20), new Vector2(1100, 250), world, true);
+                }
+                else if (playerNum == "two")
+                {
+                    CurrentProjectile = new Projectile(new Vector2(20, 20), new Vector2(200, 250), world, true);
+
+                }
+            }
 
             Vector2 projForce = Vector2.Zero;
 
-            if (TouchPanel.IsGestureAvailable)
+            if (TouchPanel.IsGestureAvailable) //&& myTurn == false)
             {
                 GestureSample gs = TouchPanel.ReadGesture();
                 switch (gs.GestureType)
@@ -225,7 +320,7 @@ namespace Gravity
                         break;
                 }
             }
-            else if (!objectMoving)
+            else if (!objectMoving && myTurn == true)
             {
                 TouchCollection touchCollection = TouchPanel.GetState();
                 foreach (TouchLocation tl in touchCollection)
@@ -329,8 +424,8 @@ namespace Gravity
 
                     JsonObject msg = new JsonObject();
                     msg["type"] = "fire";
-                    msg["vel_x"] = CurrentProjectile.Proj.LinearVelocity.X;
-                    msg["vel_y"] = CurrentProjectile.Proj.LinearVelocity.Y;
+                    msg["vel_x"] = projForce.X;
+                    msg["vel_y"] = projForce.Y;
                     msg["pos_x"] = CurrentProjectile.Position.X;
                     msg["pos_y"] = CurrentProjectile.Position.Y;
 
@@ -338,13 +433,36 @@ namespace Gravity
                 }
                 else
                 {
-                    CurrentProjectile.Position = LastVelocity;
+                    CurrentProjectile.Proj.ApplyForce(LastVelocity);
                 }
             }
 
+            if (colliding == false && CurrentProjectile != null)
+                CurrentProjectile.Proj.OnCollision += proj_OnCollision;
+            else
+            {
+                Debug.WriteLine("Game Over");
+                colliding = false;
+                betweenTurns = true;
+
+                JsonObject msg = new JsonObject();
+                msg["type"] = "turn";
+                if (playerHit == 1)
+                    msg["hit"] = "one";
+                else if (playerHit == 2)
+                    msg["hit"] = "two";
+                else
+                    msg["hit"] = "zero";
+                playerHit = 0;
+
+                websocket.Send(SimpleJson.SimpleJson.SerializeObject(msg));
 
 
+
+            }
             world.Step((float)gameTime.ElapsedGameTime.TotalSeconds);
+
+
 
             if (objectMoving && !freeMove)
             {
@@ -359,6 +477,21 @@ namespace Gravity
         }
 
         int i = 0;
+
+        private bool proj_OnCollision(Fixture f1, Fixture f2, Contact contact)
+        {
+            if ((f1.Body == CurrentProjectile.Proj && f2.Body == DeathStars[0].Planet && colliding == false))
+            {
+                colliding = true;
+                playerHit = 1;
+            }
+            else if (f1.Body == CurrentProjectile.Proj && f2.Body == DeathStars[1].Planet && colliding == false)
+            {
+                colliding = true;
+                playerHit = 2;
+            }
+            return true;
+        }
 
         /// <summary>
         /// This is called when the game should draw itself.
