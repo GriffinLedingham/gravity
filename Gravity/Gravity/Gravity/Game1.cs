@@ -293,7 +293,7 @@ namespace Gravity
             lastScale = 1.0f;
 
             LastVelocity = Vector2.Zero;
-            CurrentProjectile = null
+            CurrentProjectile = null;
             myTurnPending = null;
             myTurn = true;
 
