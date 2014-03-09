@@ -653,16 +653,15 @@ namespace Gravity
                 Menu.render(spriteBatch);
             }
             else if (isGameScreen){
-            
+
+                spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, null, null, null, null, Matrix.CreateTranslation(transVector) * Matrix.CreateScale(new Vector3(zoom, zoom, 1)));
+                spriteBatch.Draw(backgroundImage, new Rectangle(-4000, -3500, 8000, 7000), Color.White);
+
                 if (CurrentProjectile != null)
                 {
                     spriteBatch.Draw(Game1.Pixi, CurrentProjectile.Position, null, Color.Yellow, CurrentProjectile.Proj.Rotation, new Vector2(Game1.Pixi.Width / 2.0f, Game1.Pixi.Height / 2.0f), CurrentProjectile.Size, SpriteEffects.None, 0);
                     spriteBatch.Draw(Game1.ship, CurrentProjectile.Position, null, Color.White, (float)Math.PI + (float)Math.Atan2(CurrentProjectile.Proj.LinearVelocity.Y, CurrentProjectile.Proj.LinearVelocity.X), new Vector2(Game1.ship.Width / 2.0f, Game1.ship.Height / 2.0f), 0.2f, SpriteEffects.None, 0.0f);
                 }
-
-                spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, null, null, null, null, Matrix.CreateTranslation(transVector) * Matrix.CreateScale(new Vector3(zoom, zoom, 1)));
-
-                spriteBatch.Draw(backgroundImage, new Rectangle(-4000, -3500, 8000, 7000), Color.White);
 
                 foreach (DeathStar d in DeathStars)
                 {
