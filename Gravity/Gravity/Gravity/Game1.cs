@@ -364,7 +364,7 @@ namespace Gravity
                         TouchLocation old;
 
                         tl.TryGetPreviousLocation(out old);
-                        if (CurrentProjectile != null && Vector2.Distance(tl.Position - new Vector2(camX, camY), CurrentProjectile.Position) < 100)
+                        if (CurrentProjectile != null && Vector2.Distance(tl.Position - new Vector2(camX, camY), CurrentProjectile.Position) < 50)
                         {
 
                             if (old.Position.X > 0)
@@ -424,7 +424,7 @@ namespace Gravity
                         TouchLocation old;
 
                         tl.TryGetPreviousLocation(out old);
-                        if (Vector2.Distance(tl.Position - new Vector2(camX, camY), CurrentProjectile.Position) > 100)
+                        if (Vector2.Distance(tl.Position - new Vector2(camX, camY), CurrentProjectile.Position) > 50)
                         {
                             if (old.Position.X > 0)
                             {
