@@ -80,10 +80,10 @@ namespace Gravity
             Planet.BodyType = BodyType.Static;
             Planet.Position = pos * pixelToUnit;
 
-            _citySize = new Vector2(50, 50) * pixelToUnit;
+            _citySize = new Vector2(75, 25) * pixelToUnit;
             City = BodyFactory.CreateRectangle(world, _citySize.X, _citySize.Y, 10f);
             City.BodyType = BodyType.Static;
-            City.Position = Planet.Position + new Vector2(Planet.Position.X / 2 + _citySize.X / 2, 0) *(left? -1:1);
+            City.Position = Planet.Position + new Vector2(PlanetSize.X/2  + _citySize.X / 2, 0) *(left? -1:1);
 
         }
 
