@@ -144,8 +144,8 @@ namespace Gravity
 
         void handleFire(float posx, float posy, float ang, float velx, float vely, float intertia, float rot)
         {
-            CurrentProjectile = new Projectile(new Vector2(20, 20), new Vector2(posx, posy), world, false);
 
+            CurrentProjectile.Position = new Vector2(posx, posy);
             CurrentProjectile.Proj.AngularVelocity = ang;
             CurrentProjectile.Proj.LinearVelocity = new Vector2(velx, vely);
             CurrentProjectile.Proj.Inertia = intertia;
