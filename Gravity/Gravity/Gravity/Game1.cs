@@ -159,6 +159,15 @@ namespace Gravity
             betweenTurns = false;
             myTurnPending = val;
             playerNum = num;
+
+            if (playerNum == "one")
+            {
+                DeathStars[0] = new DeathStar(new Vector2(100, 100), new Vector2(100, 100), new Vector2(1), world);
+            }
+            else
+            {
+                DeathStars[1] = new DeathStar(new Vector2(100, 100), new Vector2(1300, 100), new Vector2(1), world);
+            }
         }
 
         void handleTurn(string val)
@@ -496,7 +505,10 @@ namespace Gravity
                     msg["hit"] = "zero";
                 playerHit = 0;
 
-                websocket.Send(SimpleJson.SimpleJson.SerializeObject(msg));
+                if (myTurn)
+                {
+                    websocket.Send(SimpleJson.SimpleJson.SerializeObject(msg));
+                }
             }
 
             world.Step((float)0.03f);
