@@ -87,7 +87,7 @@ namespace Gravity
 
             // Extend battery life under lock.
             InactiveSleepTime = TimeSpan.FromSeconds(1);
-            websocket = new WebSocket("ws://192.168.1.108:8142/");
+            websocket = new WebSocket("ws://134.87.140.178:8142/");
             websocket.EnableAutoSendPing = true;
             websocket.Opened += websocket_Opened;
             websocket.Closed += websocket_Closed;
@@ -244,10 +244,6 @@ namespace Gravity
 
                 Projectiles.Clear();
 
-                camY = 0;
-
-                camX = 0;
-
                 zoom = 1.0f;
                 lastScale = 1.0f;
 
@@ -266,6 +262,10 @@ namespace Gravity
                 {
                     CurrentProjectile = new Projectile(new Vector2(20, 20), new Vector2(1100, 250), world, true);
                 }
+
+                //THIS FOCUSES ON THE CAMERA WHEN YOU DO A PINCH ZOOM BACK IN, SO WE AREN'T LOST
+                camY = (int)(-CurrentProjectile.Position.Y + windowHeight / 2.0f);
+                camX = (int)(-CurrentProjectile.Position.X + windowWidth / 2.0f);
             }
             else if (myTurnPending == "false")
             {
@@ -303,7 +303,7 @@ namespace Gravity
 
             Vector2 projForce = Vector2.Zero;
 
-            if (TouchPanel.IsGestureAvailable) //&& myTurn == false) THIS IS SO YOU CAN ONLY PINCH ZOOM OUT ON OPPONENT'S TURN
+            if (TouchPanel.IsGestureAvailable && myTurn == false) //THIS IS SO YOU CAN ONLY PINCH ZOOM OUT ON OPPONENT'S TURN
             {
                 GestureSample gs = TouchPanel.ReadGesture();
                 switch (gs.GestureType)
@@ -328,7 +328,7 @@ namespace Gravity
                         break;
                 }
             }
-            else if (!objectMoving) //&& myTurn == true) THIS MAKES IT SO YOU CAN'T SHOOT THE PROJ ON YOUR OPPONENTS TURN
+            else if (!objectMoving && myTurn == true) //THIS MAKES IT SO YOU CAN'T SHOOT THE PROJ ON YOUR OPPONENTS TURN
             {
                 TouchCollection touchCollection = TouchPanel.GetState();
                 foreach (TouchLocation tl in touchCollection)
