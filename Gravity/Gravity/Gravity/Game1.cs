@@ -122,9 +122,8 @@ namespace Gravity
         void handleFire(float velx, float vely, float posx, float posy)
         {
 
-            LastVelocity = new Vector2(velx, vely);
-            CurrentProjectile.Position = new Vector2(posx, posy);
-            CurrentProjectile.Proj.LinearVelocity = LastVelocity;
+            LastVelocity = new Vector2(posx, posy);
+
             CurrentProjectile.Mine = false;
             objectMoving = true;
         }
@@ -344,7 +343,7 @@ namespace Gravity
                 }
                 else
                 {
-                    //CurrentProjectile.Proj.ApplyForce(LastVelocity);
+                    CurrentProjectile.Position = LastVelocity;
                 }
             }
 
