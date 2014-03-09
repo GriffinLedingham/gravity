@@ -41,6 +41,7 @@ namespace Gravity
         public static Texture2D turnSigns = null;
         public static Texture2D winner = null;
         public static Texture2D loser = null;
+        public static Texture2D hearts = null;
 
         public static SpriteFont gameFont = null;
 
@@ -95,6 +96,7 @@ namespace Gravity
 
         private int myHealth = 6;
         private int oppHealth = 6;
+        private const int maxHealth = 6;
 
         public MainMenu Menu;
         public EndScreen End;
@@ -251,6 +253,7 @@ namespace Gravity
             turnSigns = Content.Load<Texture2D>("turnSigns");
             winner = Content.Load<Texture2D>("pixi");
             loser = Content.Load<Texture2D>("pixi");
+            hearts = Content.Load<Texture2D>("hearts");
 
             gameFont = Content.Load<SpriteFont>("SpriteFont1");
 
@@ -740,6 +743,7 @@ namespace Gravity
             }
             else if (isGameScreen){
 
+                //GAME WORLD
                 spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, null, null, null, null, Matrix.CreateTranslation(transVector) * Matrix.CreateScale(new Vector3(zoom, zoom, 1)));
                 spriteBatch.Draw(backgroundImage, new Rectangle(-4000, -3500, 8000, 7000), Color.White);
 
@@ -759,9 +763,16 @@ namespace Gravity
                 
                 spriteBatch.End();
 
+                //GUI
                 spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);
 
-                spriteBatch.Draw(turnSigns, new Vector2(turnSigns.Width + spriteBatch.GraphicsDevice.DisplayMode.Width, 20) / 3, new Rectangle(0, myTurn ? 0 : 60, 324, 60), Color.White);
+                spriteBatch.Draw(turnSigns, new Vector2(turnSigns.Width + spriteBatch.GraphicsDevice.DisplayMode.Width + 100, 20) / 4 , new Rectangle(0, myTurn ? 0 : 60, 324, 60), Color.White);
+
+                for (int i = 0; i < maxHealth; i++)
+                {
+                    spriteBatch.Draw(hearts, new Rectangle(10 + (32 * i), 10, 32, 32), new Rectangle((i <= myHealth ? 0 : 128), 0, 128, 128), Color.White);
+                    spriteBatch.Draw(hearts, new Rectangle((spriteBatch.GraphicsDevice.DisplayMode.Width / 2) + (turnSigns.Width) + 10 + (32 * i), 10, 32, 32), new Rectangle((i <= oppHealth ? 0 : 128), 0, 128, 128), Color.White);
+                }
 
                 spriteBatch.End();
             }
