@@ -276,8 +276,8 @@ namespace Gravity
                         msg["angle"] = 0;
                         msg["force_x"] = oldForce.X;
                         msg["force_y"] = oldForce.Y;
-                        msg["pos_x"] = CurrentProjectile.Position.Y;
-                        msg["pos_x"] = CurrentProjectile.Position.Y;
+                        msg["pos_x"] = CurrentProjectile.Position.X;
+                        msg["pos_y"] = CurrentProjectile.Position.Y;
 
                         websocket.Send(SimpleJson.SimpleJson.SerializeObject(msg));
 
@@ -312,7 +312,7 @@ namespace Gravity
 
             if (!CurrentProjectile.Mine && CurrentProjectile.THISVARIABLEFUCKINGSUCKS)
             {
-                objectMoving = true;
+                objectMoving = false;
                 objectDrag = false;
 
                 projForce = CurrentProjectile.Force;
@@ -323,6 +323,8 @@ namespace Gravity
 
                 camX = CurrentProjectile.Position.X;
                 camY = CurrentProjectile.Position.Y;
+
+                CurrentProjectile.THISVARIABLEFUCKINGSUCKS = false;
 
             }
 
@@ -347,6 +349,17 @@ namespace Gravity
                 }
                 if (!float.IsNaN(projForce.X))
                     CurrentProjectile.Proj.ApplyForce(projForce);
+
+                JsonObject msg = new JsonObject();
+                msg["type"] = "fire";
+                msg["angle"] = 0;
+                msg["force_x"] = 0;
+                msg["force_y"] = 0;
+                msg["pos_x"] = CurrentProjectile.Position.X;
+                msg["pos_y"] = CurrentProjectile.Position.Y;
+
+                websocket.Send(SimpleJson.SimpleJson.SerializeObject(msg));
+
             }
 
             world.Step((float)gameTime.ElapsedGameTime.TotalSeconds);
