@@ -205,17 +205,21 @@ namespace Gravity
         void handleTurn(string val, int myNewHealth, int oppNewHealth)
         {
 
-            if (myNewHealth == 0)
+            if (myNewHealth <= 0)
             {
                 End.YouWon = false;
                 isGameScreen = false;
                 isEndScreen = true;
+                reset();
+                return;
             }
-            else if(oppNewHealth == 0)
+            else if(oppNewHealth <= 0)
             {
                 End.YouWon = true;
                 isGameScreen = false;
                 isEndScreen = true;
+                reset();
+                return;
             }
 
             Debug.WriteLine("Turn changing");
