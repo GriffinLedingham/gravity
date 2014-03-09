@@ -124,7 +124,7 @@ namespace Gravity
                     handleFire(
                         float.Parse(msg["pos_x"].ToString()),
                         float.Parse(msg["pos_y"].ToString()),
-                       float.Parse( msg["ang"].ToString()),
+                       float.Parse(msg["ang"].ToString()),
                         float.Parse(msg["vel_x"].ToString()),
                         float.Parse(msg["vel_y"].ToString()),
                         float.Parse(msg["inertia"].ToString()),
@@ -165,11 +165,11 @@ namespace Gravity
 
             if (playerNum == "one")
             {
-                DeathStars[0] = new DeathStar(new Vector2(100, 100), new Vector2(100, 100), new Vector2(1), world);
+                DeathStars[0] = new DeathStar(new Vector2(100, 100), new Vector2(100, 100), new Vector2(1), world, true);
             }
             else
             {
-                DeathStars[1] = new DeathStar(new Vector2(100, 100), new Vector2(1300, 100), new Vector2(1), world);
+                DeathStars[1] = new DeathStar(new Vector2(100, 100), new Vector2(1300, 100), new Vector2(1), world, false);
             }
         }
 
@@ -208,8 +208,8 @@ namespace Gravity
 
             world = new World(new Vector2(0, 0)); // Grav 0 cause we in space hommie
 
-            DeathStars[0] = new DeathStar(new Vector2(100, 100), new Vector2(100, 100), new Vector2(3), world);
-            DeathStars[1] = new DeathStar(new Vector2(100, 100), new Vector2(1300, 100), new Vector2(3), world);
+            DeathStars[0] = new DeathStar(new Vector2(100, 100), new Vector2(100, 100), new Vector2(3), world, true);
+            DeathStars[1] = new DeathStar(new Vector2(100, 100), new Vector2(1300, 100), new Vector2(3), world, false);
 
             //CurrentProjectile = new Projectile(new Vector2(20, 20), new Vector2(400, 250), world, true);
 
@@ -295,7 +295,7 @@ namespace Gravity
 
                 Projectiles.Clear();
 
-                
+
 
                 zoom = 1.0f;
                 lastScale = 1.0f;
@@ -568,6 +568,7 @@ namespace Gravity
             {
                 //spriteBatch.Draw(Game1.Pixi, d.Position, null, Color.Red, d.Planet.Rotation, new Vector2(Game1.Pixi.Width / 2.0f, Game1.Pixi.Height / 2.0f), d.Size, SpriteEffects.None, 0);
                 spriteBatch.Draw(planets, d.Position - new Vector2(50), new Rectangle(100 * d.index, 0, 100, 100), Color.White);
+                spriteBatch.Draw(Game1.Pixi, d.CityPosition, null, Color.Green, d.City.Rotation, new Vector2(Game1.Pixi.Width / 2.0f, Game1.Pixi.Height / 2.0f), d.CitySize, SpriteEffects.None, 0);
             }
             if (CurrentProjectile != null)
                 spriteBatch.Draw(Game1.Pixi, CurrentProjectile.Position, null, Color.Yellow, CurrentProjectile.Proj.Rotation, new Vector2(Game1.Pixi.Width / 2.0f, Game1.Pixi.Height / 2.0f), CurrentProjectile.Size, SpriteEffects.None, 0);

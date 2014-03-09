@@ -21,6 +21,26 @@ namespace Gravity
 
         public int index = 0;
 
+        public Body City;
+        public Vector2 _citySize;
+
+        public Vector2 CitySize
+        {
+            get
+            {
+                return _citySize * unitToPixel;
+            }
+        }
+
+        public Vector2 CityPosition
+        {
+            get
+            {
+                return City.Position * unitToPixel;
+            }
+        }
+
+
         public Vector2 Position
         {
             get
@@ -46,7 +66,7 @@ namespace Gravity
         /// <param name="size"></param>
         /// <param name="pos"></param>
         /// <param name="world"></param>
-        public DeathStar(Vector2 size, Vector2 pos, Vector2 pull, World world)
+        public DeathStar(Vector2 size, Vector2 pos, Vector2 pull, World world, bool left)
         {
             PlanetSize = size * pixelToUnit;
             this.world = world;
@@ -60,8 +80,10 @@ namespace Gravity
             Planet.BodyType = BodyType.Static;
             Planet.Position = pos * pixelToUnit;
 
-
-
+            _citySize = new Vector2(50, 50) * pixelToUnit;
+            City = BodyFactory.CreateRectangle(world, _citySize.X, _citySize.Y, 10f);
+            City.BodyType = BodyType.Static;
+            City.Position = Planet.Position + new Vector2(Planet.Position.X / 2 + _citySize.X / 2, 0) *(left? -1:1);
 
         }
 
