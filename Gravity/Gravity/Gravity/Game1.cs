@@ -332,11 +332,21 @@ namespace Gravity
 
                 if (playerNum == "one")
                 {
+
+                    if (CurrentProjectile != null && CurrentProjectile.Proj != null)
+                    {
+                        CurrentProjectile.Proj.OnCollision -= proj_OnCollision;
+                    }
+
                     CurrentProjectile = new Projectile(new Vector2(20, 20), new Vector2(DS1Pos + 100, 250), world, true);
                     CurrentProjectile.Proj.OnCollision += proj_OnCollision;
                 }
                 else if (playerNum == "two")
                 {
+                    if (CurrentProjectile != null && CurrentProjectile.Proj != null)
+                    {
+                        CurrentProjectile.Proj.OnCollision -= proj_OnCollision;
+                    }
                     CurrentProjectile = new Projectile(new Vector2(20, 20), new Vector2(DS2Pos - 100, 250), world, true);
                     CurrentProjectile.Proj.OnCollision += proj_OnCollision;
                 }
@@ -366,12 +376,20 @@ namespace Gravity
 
                 if (playerNum == "one")
                 {
-                    CurrentProjectile = new Projectile(new Vector2(20, 20), new Vector2(DS2Pos - 100, 250), world, true);
+                    if (CurrentProjectile != null && CurrentProjectile.Proj != null)
+                    {
+                        CurrentProjectile.Proj.OnCollision -= proj_OnCollision;
+                    }
+                    CurrentProjectile = new Projectile(new Vector2(20, 20), new Vector2(DS2Pos - 100, 250), world, false);
                     CurrentProjectile.Proj.OnCollision += proj_OnCollision;
                 }
                 else if (playerNum == "two")
                 {
-                    CurrentProjectile = new Projectile(new Vector2(20, 20), new Vector2(DS1Pos + 100, 250), world, true);
+                    if (CurrentProjectile != null && CurrentProjectile.Proj != null)
+                    {
+                        CurrentProjectile.Proj.OnCollision -= proj_OnCollision;
+                    }
+                    CurrentProjectile = new Projectile(new Vector2(20, 20), new Vector2(DS1Pos + 100, 250), world, false);
                     CurrentProjectile.Proj.OnCollision += proj_OnCollision;
 
                 }
@@ -533,18 +551,24 @@ namespace Gravity
 
                 if (CurrentProjectile.Mine)
                 {
-                    JsonObject msg = new JsonObject();
-                    msg["type"] = "fire";
-                    msg["pos_x"] = CurrentProjectile.Position.X;
-                    msg["pos_y"] = CurrentProjectile.Position.Y;
-                    msg["ang"] = CurrentProjectile.Proj.AngularVelocity;
-                    msg["vel_x"] = CurrentProjectile.Proj.LinearVelocity.X;
-                    msg["vel_y"] = CurrentProjectile.Proj.LinearVelocity.Y;
-                    msg["inertia"] = CurrentProjectile.Proj.Inertia;
-                    msg["rot"] = CurrentProjectile.Proj.Rotation;
+                    try
+                    {
+                        JsonObject msg = new JsonObject();
+                        msg["type"] = "fire";
+                        msg["pos_x"] = CurrentProjectile.Position.X;
+                        msg["pos_y"] = CurrentProjectile.Position.Y;
+                        msg["ang"] = CurrentProjectile.Proj.AngularVelocity;
+                        msg["vel_x"] = CurrentProjectile.Proj.LinearVelocity.X;
+                        msg["vel_y"] = CurrentProjectile.Proj.LinearVelocity.Y;
+                        msg["inertia"] = CurrentProjectile.Proj.Inertia;
+                        msg["rot"] = CurrentProjectile.Proj.Rotation;
 
-                    websocket.Send(SimpleJson.SimpleJson.SerializeObject(msg));
+                        websocket.Send(SimpleJson.SimpleJson.SerializeObject(msg));
+                    }
+                    catch (Exception e)
+                    {
 
+                    }
 
                     CurrentProjectile.Proj.ApplyForce(projForce);
                 }
@@ -612,7 +636,10 @@ namespace Gravity
                 colliding = true;
                 playerHit = 2;
             }*/
-
+            if (betweenTurns || colliding || !(myTurn)  || myTurnPending != null)
+            {
+                return false;
+            }
             if ((f1.Body == CurrentProjectile.Proj) && colliding == false)
             {
                 if (f2.Body == DeathStars[0].Planet)
