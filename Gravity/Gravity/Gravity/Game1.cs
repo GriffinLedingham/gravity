@@ -119,13 +119,17 @@ namespace Gravity
             string type = (string)msg["type"];
             switch (type)
             {
+
                 case "fire":
-                    CurrentProjectile.Proj = SimpleJson.SimpleJson.DeserializeObject<Body>(msg["obj"].ToString());
+                    handleFire(
+                        float.Parse(msg["pos_x"].ToString()),
+                        float.Parse(msg["pos_y"].ToString()),
+                       float.Parse( msg["ang"].ToString()),
+                        float.Parse(msg["vel_x"].ToString()),
+                        float.Parse(msg["vel_y"].ToString()),
+                        float.Parse(msg["inertia"].ToString()),
+                        float.Parse(msg["rot"].ToString()));
 
-                    Debug.WriteLine(CurrentProjectile.Proj);
-
-                    objectMoving = true;
-                        
                     break;
                 case "auth":
                     handleAuth((string)msg["mine"], (string)msg["number"]);
@@ -138,11 +142,15 @@ namespace Gravity
 
 
 
-        void handleFire(float force_x, float force_y, float posx, float posy)
+        void handleFire(float posx, float posy, float ang, float velx, float vely, float intertia, float rot)
         {
             CurrentProjectile = new Projectile(new Vector2(20, 20), new Vector2(posx, posy), world, false);
 
-            LastVelocity = new Vector2(force_x, force_y);
+            CurrentProjectile.Proj.AngularVelocity = ang;
+            CurrentProjectile.Proj.LinearVelocity = new Vector2(velx, vely);
+            CurrentProjectile.Proj.Inertia = intertia;
+            CurrentProjectile.Proj.Rotation = rot;
+
             CurrentProjectile.THISVARIABLEFUCKINGSUCKS = true;
         }
 
@@ -438,7 +446,6 @@ namespace Gravity
                     float len = forcedir.Length();
                     forcedir.Normalize();
 
-
                     if (len < 1000)
                     {
                         forcedir = forcedir * (1 - len / 1000) * d.Pull;
@@ -447,12 +454,28 @@ namespace Gravity
                     }
 
                 }
-                CurrentProjectile.Proj.ApplyForce(projForce);
-                JsonObject msg = new JsonObject();
-                msg["type"] = "fire";
-                msg["obj"] = SimpleJson.SimpleJson.SerializeObject(CurrentProjectile.Proj);
 
-                websocket.Send(SimpleJson.SimpleJson.SerializeObject(msg));
+                if (CurrentProjectile.Mine)
+                {
+                    JsonObject msg = new JsonObject();
+                    msg["type"] = "fire";
+                    msg["pos_x"] = CurrentProjectile.Position.X;
+                    msg["pos_y"] = CurrentProjectile.Position.Y;
+                    msg["ang"] = CurrentProjectile.Proj.AngularVelocity;
+                    msg["vel_x"] = CurrentProjectile.Proj.LinearVelocity.X;
+                    msg["vel_y"] = CurrentProjectile.Proj.LinearVelocity.Y;
+                    msg["inertia"] = CurrentProjectile.Proj.Inertia;
+                    msg["rot"] = CurrentProjectile.Proj.Rotation;
+
+                    websocket.Send(SimpleJson.SimpleJson.SerializeObject(msg));
+
+
+                    CurrentProjectile.Proj.ApplyForce(projForce);
+                }
+                else
+                {
+
+                }
             }
 
             if (colliding == false && CurrentProjectile != null)
