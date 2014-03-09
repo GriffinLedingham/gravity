@@ -86,6 +86,9 @@ namespace Gravity
         public bool isMenuScreen = true;
         public bool isGameScreen = false;
 
+        private int myHealth = 6;
+        private int oppHealth = 6;
+
         public MainMenu Menu;
 
         public Game1()
@@ -143,7 +146,7 @@ namespace Gravity
                     handleAuth((string)msg["mine"], (string)msg["number"]);
                     break;
                 case "turn":
-                    handleTurn((string)msg["mine"]);
+                    handleTurn((string)msg["mine"], int.Parse(msg["myHealth"].ToString()), int.Parse(msg["oppHealth"].ToString()));
                     break;
                 case "kill":
                     betweenTurns = true;
@@ -182,9 +185,11 @@ namespace Gravity
             }
         }
 
-        void handleTurn(string val)
+        void handleTurn(string val, int myNewHealth, int oppNewHealth)
         {
             Debug.WriteLine("Turn changing");
+            myHealth = myNewHealth;
+            oppHealth = oppNewHealth;
             betweenTurns = false;
             colliding = false;
             myTurnPending = val;
