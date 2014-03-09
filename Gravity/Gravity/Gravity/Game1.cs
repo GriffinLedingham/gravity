@@ -36,6 +36,7 @@ namespace Gravity
         private Texture2D planets = null;
         private Texture2D gameLogo = null;
         private Texture2D towers = null;
+        public static Texture2D ship = null;
 
         const float unitToPixel = 100.0f;
         const float pixelToUnit = 1 / unitToPixel;
@@ -216,6 +217,7 @@ namespace Gravity
             planets = Content.Load<Texture2D>("planets");
             gameLogo = Content.Load<Texture2D>("logo");
             towers = Content.Load<Texture2D>("towers");
+            ship = Content.Load<Texture2D>("corgiShip");
 
             world = new World(new Vector2(0, 0)); // Grav 0 cause we in space hommie
 
@@ -266,7 +268,7 @@ namespace Gravity
 
 
                 freeMove = false;
-                CurrentProjectile = new Projectile(new Vector2(20, 20), new Vector2(DS1Pos + 200, 250), world, true);
+                CurrentProjectile = new Projectile(new Vector2(40, 40), new Vector2(DS1Pos + 200, 250), world, true);
 
             }
             if (myTurnPending == "true")
@@ -616,7 +618,10 @@ namespace Gravity
                 spriteBatch.Draw(towers, d.CityPosition + (d.left ? Vector2.Zero : new Vector2(23, 0)), new Rectangle(0, (d.left) ? 44 : 0, 100, 44), Color.White, 0.0f, new Vector2(towers.Width / 2.0f + 10, towers.Height / 4.0f), 1.0f, d.left ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0.0f);
             }
             if (CurrentProjectile != null)
+            {
                 spriteBatch.Draw(Game1.Pixi, CurrentProjectile.Position, null, Color.Yellow, CurrentProjectile.Proj.Rotation, new Vector2(Game1.Pixi.Width / 2.0f, Game1.Pixi.Height / 2.0f), CurrentProjectile.Size, SpriteEffects.None, 0);
+                spriteBatch.Draw(Game1.ship, CurrentProjectile.Position, null, Color.White, (float)Math.PI + (float)Math.Atan2(CurrentProjectile.Proj.LinearVelocity.Y, CurrentProjectile.Proj.LinearVelocity.X), new Vector2(Game1.ship.Width / 2.0f, Game1.ship.Height / 2.0f), 0.2f, SpriteEffects.None, 0.0f);
+            }
 
             spriteBatch.End();
 
