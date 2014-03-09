@@ -165,8 +165,6 @@ namespace Gravity
             }
         }
 
-
-
         void handleFire(float posx, float posy, float ang, float velx, float vely, float intertia, float rot)
         {
 
@@ -292,7 +290,7 @@ namespace Gravity
             lastScale = 1.0f;
 
             LastVelocity = Vector2.Zero;
-
+            CurrentProjectile = null
             myTurnPending = null;
             myTurn = true;
 
