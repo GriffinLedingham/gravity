@@ -38,6 +38,7 @@ namespace Gravity
         public static Texture2D towers = null;
         public static Texture2D ship = null;
         public static Texture2D menuSprites = null;
+        public static Texture2D turnSigns = null;
 
         public static SpriteFont gameFont = null;
 
@@ -222,6 +223,7 @@ namespace Gravity
             towers = Content.Load<Texture2D>("towers");
             ship = Content.Load<Texture2D>("corgiShip");
             menuSprites = Content.Load<Texture2D>("menusprites");
+            turnSigns = Content.Load<Texture2D>("turnSigns");
 
             gameFont = Content.Load<SpriteFont>("SpriteFont1");
 
@@ -720,6 +722,12 @@ namespace Gravity
                     spriteBatch.Draw(towers, d.CityPosition + (d.left ? Vector2.Zero : new Vector2(23, 0)), new Rectangle(0, (d.left) ? 44 : 0, 100, 44), Color.White, 0.0f, new Vector2(towers.Width / 2.0f + 10, towers.Height / 4.0f), 1.0f, d.left ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0.0f);
                 }
                 
+                spriteBatch.End();
+
+                spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);
+
+                spriteBatch.Draw(turnSigns, new Vector2(turnSigns.Width + spriteBatch.GraphicsDevice.DisplayMode.Width, 20) / 3, new Rectangle(0, myTurn ? 0 : 60, 324, 60), Color.White);
+
                 spriteBatch.End();
             }
         
