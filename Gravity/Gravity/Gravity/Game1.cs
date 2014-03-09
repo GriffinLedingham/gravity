@@ -77,6 +77,10 @@ namespace Gravity
         private bool colliding = false;
 
         private int playerHit = 0;
+        private int playerHitCity = 0;
+
+        public int DS1Pos = 200;
+        public int DS2Pos = 1400;
 
         public Game1()
         {
@@ -167,11 +171,11 @@ namespace Gravity
 
             if (playerNum == "one")
             {
-                DeathStars[0] = new DeathStar(new Vector2(100, 100), new Vector2(200, 100), new Vector2(1), world, true);
+                DeathStars[0] = new DeathStar(new Vector2(100, 100), new Vector2(DS1Pos, 100), new Vector2(1), world, true);
             }
             else
             {
-                DeathStars[1] = new DeathStar(new Vector2(100, 100), new Vector2(1400, 100), new Vector2(1), world, false);
+                DeathStars[1] = new DeathStar(new Vector2(100, 100), new Vector2(DS2Pos, 100), new Vector2(1), world, false);
             }
         }
 
@@ -212,8 +216,8 @@ namespace Gravity
 
             world = new World(new Vector2(0, 0)); // Grav 0 cause we in space hommie
 
-            DeathStars[0] = new DeathStar(new Vector2(100, 100), new Vector2(200, 100), new Vector2(3), world, true);
-            DeathStars[1] = new DeathStar(new Vector2(100, 100), new Vector2(1400, 100), new Vector2(3), world, false);
+            DeathStars[0] = new DeathStar(new Vector2(100, 100), new Vector2(DS1Pos, 100), new Vector2(3), world, true);
+            DeathStars[1] = new DeathStar(new Vector2(100, 100), new Vector2(DS2Pos, 100), new Vector2(3), world, false);
 
             //CurrentProjectile = new Projectile(new Vector2(20, 20), new Vector2(400, 250), world, true);
 
@@ -259,7 +263,7 @@ namespace Gravity
 
 
                 freeMove = false;
-                CurrentProjectile = new Projectile(new Vector2(20, 20), new Vector2(400, 250), world, true);
+                CurrentProjectile = new Projectile(new Vector2(20, 20), new Vector2(DS1Pos + 200, 250), world, true);
 
             }
             if (myTurnPending == "true")
@@ -281,11 +285,11 @@ namespace Gravity
 
                 if (playerNum == "one")
                 {
-                    CurrentProjectile = new Projectile(new Vector2(20, 20), new Vector2(300, 250), world, true);
+                    CurrentProjectile = new Projectile(new Vector2(20, 20), new Vector2(DS1Pos + 100, 250), world, true);
                 }
                 else if (playerNum == "two")
                 {
-                    CurrentProjectile = new Projectile(new Vector2(20, 20), new Vector2(1200, 250), world, true);
+                    CurrentProjectile = new Projectile(new Vector2(20, 20), new Vector2(DS2Pos - 100, 250), world, true);
                 }
 
                 //THIS FOCUSES ON THE CAMERA WHEN YOU DO A PINCH ZOOM BACK IN, SO WE AREN'T LOST
@@ -313,11 +317,11 @@ namespace Gravity
 
                 if (playerNum == "one")
                 {
-                    CurrentProjectile = new Projectile(new Vector2(20, 20), new Vector2(1200, 250), world, true);
+                    CurrentProjectile = new Projectile(new Vector2(20, 20), new Vector2(DS2Pos - 100, 250), world, true);
                 }
                 else if (playerNum == "two")
                 {
-                    CurrentProjectile = new Projectile(new Vector2(20, 20), new Vector2(300, 250), world, true);
+                    CurrentProjectile = new Projectile(new Vector2(20, 20), new Vector2(DS1Pos + 100, 250), world, true);
 
                 }
 
@@ -513,9 +517,18 @@ namespace Gravity
                     msg["hit"] = "one";
                 else if (playerHit == 2)
                     msg["hit"] = "two";
+                else if (playerHitCity == 1)
+                    msg["cityHit"] = "one";
+                else if(playerHitCity == 2)
+                    msg["cityHit"] = "two";
                 else
+                {
                     msg["hit"] = "zero";
+                    msg["cityHit"] = "zero";
+                }
+                    
                 playerHit = 0;
+                playerHitCity = 0;
 
                 if (myTurn)
                 {
@@ -541,7 +554,7 @@ namespace Gravity
 
         private bool proj_OnCollision(Fixture f1, Fixture f2, Contact contact)
         {
-            if ((f1.Body == CurrentProjectile.Proj && f2.Body == DeathStars[0].Planet && colliding == false))
+            /*if ((f1.Body == CurrentProjectile.Proj && f2.Body == DeathStars[0].Planet && colliding == false))
             {
                 colliding = true;
                 playerHit = 1;
@@ -550,7 +563,32 @@ namespace Gravity
             {
                 colliding = true;
                 playerHit = 2;
+            }*/
+
+            if ((f1.Body == CurrentProjectile.Proj) && colliding == false)
+            {
+                if (f2.Body == DeathStars[0].Planet)
+                {
+                    colliding = true;
+                    playerHit = 1;
+                }
+                else if(f2.Body == DeathStars[1].Planet)
+                {
+                    colliding = true;
+                    playerHit = 2;
+                }
+                else if (f2.Body == DeathStars[0].City)
+                {
+                    colliding = true;
+                    playerHitCity = 1;
+                }
+                else if (f2.Body == DeathStars[1].City)
+                {
+                    colliding = true;
+                    playerHitCity = 2;
+                }
             }
+
             return true;
         }
 
