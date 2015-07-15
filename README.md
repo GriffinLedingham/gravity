@@ -1,6 +1,6 @@
 gravity
 =======
-This game was made for a Windows Phone game jam sponsored by Microsoft. Other team members were [Griffin](https://github.com/GriffinLedingham) and [Dan](https://github.com/danbolt)
+This game was made for a Windows Phone game jam sponsored by Microsoft. Other team members were [Paul](https://github.com/toadums) and [Dan](https://github.com/danbolt)
 
 ## Client Setup
 
